@@ -4,8 +4,10 @@ import io.atomix.cluster.messaging.impl.NettyMessagingService;
 import io.atomix.utils.net.Address;
 import io.atomix.utils.serializer.Serializer;
 import io.atomix.utils.serializer.SerializerBuilder;
+import org.apache.commons.math3.analysis.function.Add;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,16 +19,11 @@ import java.util.stream.IntStream;
 public class TwitterClient {
 
     private Address address;
-    private List<Address> addresses;
     private MessagingService messagingService;
-    private VectorClock vectorClock;
 
-    public TwitterClient(Address address, List<Address> addresses) throws Exception {
+    public TwitterClient(Address address, Address servidor ) throws Exception {
 
         this.address = address;
-        this.addresses = addresses;
-        this.vectorClock = new VectorClock(addresses.indexOf(address), addresses.size());
-
         ExecutorService e = Executors.newFixedThreadPool(1);
 
         // Starting messaging service
@@ -38,137 +35,110 @@ public class TwitterClient {
         messagingService.start();
 
         // Creating serializer for encoding and decoding to/from bytes
-        Serializer s = new SerializerBuilder().addType(Message.class).addType(VectorClock.class).build();
+        Serializer s = new SerializerBuilder().addType(Address.class).build();
 
         // Register Handler for when a message is received
-        messagingService.registerHandler("MSG", (addr,bytes)-> {
+        messagingService.registerHandler("ADDRESS", (addr,bytes)-> {
 
             // Decoding data received
-            Message msg = s.decode(bytes);
+            Address msg = s.decode(bytes);
 
             // Printing it
-            System.out.println(msg.vectorClock.toString() + " -> " + msg.message);
-
-            // Updating inner vector clock
-            this.vectorClock.update(msg.vectorClock);
-
+            System.out.println("Ip servidor = " + msg.toString());
+            try {
+                startCliente(msg); // msg = address
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }, e);
 
 
         // Sending a message when input is received
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String msg;
+        String msg = "";
 
-        while (!(msg = in.readLine()).toUpperCase().equals("EXIT")) {
-
-            // Incrementing Vector Clock on send
-            vectorClock.increment();
-
-            // Creating the message and serializing it
-            byte[] data = s.encode(new Message(msg, vectorClock));
-
-            // Sending the message to every client but itself
-            for (Address addr : addresses)
-                if (!addr.equals(address))
-                    messagingService.sendAsync(addr, "MSG", data);
+         // Creating the message and serializing it
+         byte[] data = s.encode(msg);
+         // Sending the message to every client but itself
+         messagingService.sendAsync(servidor, "GET_ADDR", data);
 
         }
 
+        public void startCliente(Address address) throws IOException {
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            String msg;
+            int tipo_menu = 0;
+            int resultado = 0;
 
-    }
+            print_menu();
 
-    private static class Message {
+            while (!(msg = in.readLine()).toUpperCase().equals("EXIT")) {
 
-        public String message;
-        public VectorClock vectorClock;
+                try{
+                    resultado = Integer.parseInt(msg);
+                    switch (resultado){
+                        case 0:
+                            print_menu();
+                            break;
+                        case 1:
+                            fazer_post(in, address);
+                            break;/*
+                        case 2:
+                            deal_subscriptions(in);
+                            break;
+                        case 3:
+                            pedir_posts(in, address);
+                            break;*/
+                        default:
+                            System.out.printf("Opcao invalida");
+                    }
+                    //tipo_menu = resultado;
 
-        public Message (String message, VectorClock vectorClock) {
+                }catch (Exception e){
+                    System.out.printf("Valor não é um inteiro\n");
+                }
 
-            this.message = message;
-            this.vectorClock = vectorClock;
-
-        }
-
-    }
-
-    public static class VectorClock {
-
-        private int id;
-        private int[] clock;
-
-        public VectorClock (int id, int vcSize) {
-
-            this.id = id;
-            this.clock = new int[vcSize];
-
-        }
-
-        public void increment () { clock[id]++; }
-
-        public void update (VectorClock vectorClock) {
-
-            if (IntStream.range(0, clock.length)
-                            .filter(i -> i != id)
-                            .allMatch(i -> this.clock[i] <= vectorClock.clock[i])) {
-
-                // Updating the local vector clock
-                int id_value = this.clock[id];
-                this.clock = vectorClock.clock;
-                this.clock[id] = id_value;
 
             }
 
         }
 
-        public void print () { System.out.println(this.toString()); }
+        public void fazer_post(BufferedReader in, Address address){
+            System.out.println("Escreva o post:");
+            try {
+                String mensagem = in.readLine();
+                String[] split = mensagem.split("#[a-zA-Z_]*");
+                System.out.printf( split[1]) ;
+                for ( String cena : split)
+                {
+                    System.out.printf(cena);
 
-        @Override
-        public String toString () { return id + " : " + Arrays.toString(clock); }
+                }
 
-    }
-
-    public static void vectorClockTest () {
-
-        // Start vector clocks
-        VectorClock v0 = new VectorClock(0, 3);
-        VectorClock v1 = new VectorClock(1, 3);
-        VectorClock v2 = new VectorClock(2, 3);
-
-        // Send v0
-        v0.increment(); v1.update(v0); v2.update(v0);
-
-        // Send v1
-        v1.increment(); v0.update(v1); v2.update(v1);
-
-        // Send v2
-        v2.increment(); v0.update(v2); v1.update(v2);
-
-        // Interwine
-        v1.increment();
-        v0.increment();
-        v0.update(v1);
-        v1.update(v0);
-        v2.update(v0);
-        v2.update(v1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 
-        // Print final states
-        v0.print(); v1.print(); v2.print();
+        }
 
-    }
+        public void print_menu(){
+            System.out.println("#####################################################");
+            System.out.println("# 1 - Fazer um Post                                 #");
+            System.out.println("# 2 - Adicionar/Remover subscricoes                 #");
+            System.out.println("# 3 - Pedir 10 posts mais recentes das subscricoes  #");
+            System.out.println("#####################################################");
+        }
 
     public static void main(String[] args) throws Exception {
 
         // Getting port from command line
-        int port = Integer.parseInt(args[0]);
+        int port =  10001; // Integer.parseInt(args[0]);
 
         // Making an Address based on the command line arguments
         Address address = Address.from(port);
-        List<Address> addresses = new ArrayList<>();
 
-        for (int i=10001; i<=10005; i++) addresses.add(Address.from(i));
-
-        new TwitterClient(address, addresses);
+        new TwitterClient(address, Address.from(10000) );
 
         //vectorClockTest();
     }

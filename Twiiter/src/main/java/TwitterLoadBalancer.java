@@ -38,12 +38,12 @@ public class TwitterLoadBalancer {
         // Register Handler for when a message is received
         messagingService.registerHandler("GET_ADDR", (addr, bytes) -> {
 
-            int index = r.nextInt() % this.addresses.size();
+            int index = r.nextInt(this.addresses.size());
 
             // Serializing the Address
             byte[] data = s.encode(this.addresses.get(index));
 
-            messagingService.sendAsync(addr, "MSG", data);
+            messagingService.sendAsync(addr, "ADDRESS", data);
 
         }, e);
 
@@ -72,7 +72,7 @@ public class TwitterLoadBalancer {
 
         // Filling a list with the addresses of those servers
         List<Address> addresses = new ArrayList<>();
-        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(port + i));
+        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(1000 + i));
 
         new TwitterLoadBalancer(address, addresses).start();
 

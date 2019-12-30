@@ -1,23 +1,13 @@
-package proto;
+package Protos;
 
 import java.util.ArrayList;
 
-public class Post {
+public class Get {
 
-    private String            text;
     private ArrayList<String> categories;
 
-    public Post(String text, ArrayList<String> categories) {
-        this.text = text;
+    public Get(ArrayList<String> categories) {
         this.categories = categories;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public ArrayList<String> getCategories() {
@@ -27,4 +17,5 @@ public class Post {
     public void setCategories(ArrayList<String> categories) {
         this.categories = categories;
     }
+
 }

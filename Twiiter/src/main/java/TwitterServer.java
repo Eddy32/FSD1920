@@ -10,166 +10,175 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 public class TwitterServer {
 
-    private Address address;
+    private int id;
+    private int leader;
     private List<Address> addresses;
-    private MessagingService messagingService;
+    private ManagedMessagingService messagingService;
     private VectorClock vectorClock;
+    private ArrayList<TreeMap<Integer, Protos.TryUpdate>> serverQueue;
 
-    public TwitterServer(Address address, List<Address> addresses) throws Exception {
+    public TwitterServer(int id, List<Address> addresses) throws Exception {
 
-        this.address = address;
+        this.id = id;
+        this.leader = 0;
         this.addresses = addresses;
-        this.vectorClock = new VectorClock(addresses.indexOf(address), addresses.size());
+        this.vectorClock = new VectorClock(id, addresses.size());
 
-        ExecutorService e = Executors.newFixedThreadPool(1);
+        this.serverQueue = new ArrayList<>();
+        for (int i=0; i<addresses.size(); i++) serverQueue.add(new TreeMap<>());
+
+        ExecutorService e = Executors.newFixedThreadPool(6);
 
         // Starting messaging service
+        messagingService = new NettyMessagingService.Builder()
+                .withName("Twitter_Server_" + id)
+                .withReturnAddress(addresses.get(id)).build();
 
-        ManagedMessagingService messagingService = new NettyMessagingService.Builder()
-                .withName("Chat_" + address.toString())
-                .withReturnAddress(address).build();
+        // Serializers
+        Serializer post_serializer = new SerializerBuilder().addType(Protos.Post.class).build();
+        Serializer try_update_serializer = new SerializerBuilder().addType(Protos.TryUpdate.class).build();
+        Serializer update_serializer = new SerializerBuilder().addType(Protos.Update.class).build();
+        Serializer get_serializer = new SerializerBuilder().addType(Protos.Get.class).build();
+        Serializer list_serializer = new SerializerBuilder().addType(Protos.List.class).build();
 
-        messagingService.start();
+        // When a POST message is received
+        messagingService.registerHandler("POST", (addr,bytes)-> {
 
-        // Creating serializer for encoding and decoding to/from bytes
-        Serializer s = new SerializerBuilder().addType(Message.class).addType(VectorClock.class).build();
+            // Decoding post info
+            Protos.Post post = post_serializer.decode(bytes);
 
-        // Register Handler for when a message is received
-        messagingService.registerHandler("MSG", (addr,bytes)-> {
+            String post_text = post.getText();
+            ArrayList<String> post_topics = post.getCategories();
 
-            // Decoding data received
-            Message msg = s.decode(bytes);
+            // Sending try updates by topic
+            for (String topic: post_topics) {
 
-            // Printing it
-            System.out.println(msg.vectorClock.toString() + " -> " + msg.message);
+                Protos.TryUpdate try_update = new Protos.TryUpdate(topic, post_text, vectorClock.getId(), vectorClock.getSelf());
 
-            // Updating inner vector clock
-            this.vectorClock.update(msg.vectorClock);
+                byte[] data = try_update_serializer.encode(try_update);
 
-        }, e);
-
-
-        // Sending a message when input is received
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String msg;
-
-        while (!(msg = in.readLine()).toUpperCase().equals("EXIT")) {
-
-            // Incrementing Vector Clock on send
-            vectorClock.increment();
-
-            // Creating the message and serializing it
-            byte[] data = s.encode(new Message(msg, vectorClock));
-
-            // Sending the message to every client but itself
-            for (Address addr : addresses)
-                if (!addr.equals(address))
-                    messagingService.sendAsync(addr, "MSG", data);
-
-        }
-
-
-    }
-
-    private static class Message {
-
-        public String message;
-        public VectorClock vectorClock;
-
-        public Message (String message, VectorClock vectorClock) {
-
-            this.message = message;
-            this.vectorClock = vectorClock;
-
-        }
-
-    }
-
-    public static class VectorClock {
-
-        private int id;
-        private int[] clock;
-
-        public VectorClock (int id, int vcSize) {
-
-            this.id = id;
-            this.clock = new int[vcSize];
-
-        }
-
-        public void increment () { clock[id]++; }
-
-        public void update (VectorClock vectorClock) {
-
-            if (IntStream.range(0, clock.length)
-                            .filter(i -> i != id)
-                            .allMatch(i -> this.clock[i] <= vectorClock.clock[i])) {
-
-                // Updating the local vector clock
-                int id_value = this.clock[id];
-                this.clock = vectorClock.clock;
-                this.clock[id] = id_value;
+                messagingService.sendAsync(addresses.get(leader), "TRY_UPDATE", data);
 
             }
 
-        }
+        }, e);
 
-        public void print () { System.out.println(this.toString()); }
+        // When a TRY UPDATE message is received
+        messagingService.registerHandler("TRY_UPDATE", (addr,bytes)-> {
 
-        @Override
-        public String toString () { return id + " : " + Arrays.toString(clock); }
+            // Decoding data received
+            Protos.TryUpdate try_update = try_update_serializer.decode(bytes);
+
+            String post_text = try_update.getText();
+            String post_topic = try_update.getCategory();
+            int serverId = try_update.getServerId();
+            int serverClock = try_update.getServerClock();
+
+            if (serverClock == vectorClock.getClock(serverId) + 1) {
+
+                for (int i = serverClock; !serverQueue.get(serverId).containsKey(i); i++) {
+
+                    // IR BUSCAR INDICE A BASE DE DADOS
+
+                    Protos.Update broadcast = new Protos.Update(post_text, post_topic, , );
+
+                    byte[] data = update_serializer.encode(broadcast);
+
+                    messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
+
+                }
+
+            } else {
+
+                // Adding to queue
+                serverQueue.get(serverId).put(serverId, try_update);
+
+            }
+
+            Protos.Update broadcast = new Protos.Update(post_text, post_topic, )
+
+        }, e);
+
+        // When a BROADCAST message is received
+        messagingService.registerHandler("BROADCAST", (addr,bytes)-> {
+
+            for (Address a : addresses) messagingService.sendAsync(a, "TRY_UPDATE", bytes);
+
+        }, e);
+
+        // When an UPDATE message is received
+        messagingService.registerHandler("UPDATE", (addr,bytes)-> {
+
+            // Decoding data received
+            Protos.Update update = update_serializer.decode(bytes);
+
+            String post_text = update.getText();
+            String post_topic = update.getCategory();
+            int topicIndex = update.getIndex();
+            int topicCounter = update.getIterator();
+
+            // ATUALIZAR BASE DE DADOS SE TOPIC COUNTER FOR INFERIOR
+
+        }, e);
+
+        // When a GET message is received
+        messagingService.registerHandler("GET", (addr,bytes)-> {
+
+            // Decoding data received
+            Protos.Get get = get_serializer.decode(bytes);
+
+            ArrayList<String> post_topics = get.getCategories();
+
+            // IR BUSCAR A BASE DE DADOS
+
+            ArrayList<String> recentPosts;
+
+            Protos.List list = new Protos.List(recentPosts);
+
+            byte[] data = list_serializer.encode(list);
+
+            messagingService.sendAsync(addr, "LIST", data);
+
+        }, e);
 
     }
 
-    public static void vectorClockTest () {
+    public void start () {
 
-        // Start vector clocks
-        VectorClock v0 = new VectorClock(0, 3);
-        VectorClock v1 = new VectorClock(1, 3);
-        VectorClock v2 = new VectorClock(2, 3);
-
-        // Send v0
-        v0.increment(); v1.update(v0); v2.update(v0);
-
-        // Send v1
-        v1.increment(); v0.update(v1); v2.update(v1);
-
-        // Send v2
-        v2.increment(); v0.update(v2); v1.update(v2);
-
-        // Interwine
-        v1.increment();
-        v0.increment();
-        v0.update(v1);
-        v1.update(v0);
-        v2.update(v0);
-        v2.update(v1);
-
-
-        // Print final states
-        v0.print(); v1.print(); v2.print();
+        messagingService.start();
 
     }
+
+    public void stop () {
+
+        messagingService.stop();
+
+    }
+
 
     public static void main(String[] args) throws Exception {
 
-        // Getting port from command line
-        int port = Integer.parseInt(args[0]);
+        // Getting id from command line
+        int id = Integer.parseInt(args[0]);
 
-        // Making an Address based on the command line arguments
-        Address address = Address.from(port);
+        // Getting initial port from command line
+        int base_port = Integer.parseInt(args[1]);
+
+        // Getting the number of servers from the command line arguments
+        int no_addresses = Integer.parseInt((args[2]));
+
+        // Filling a list with the addresses of those servers
         List<Address> addresses = new ArrayList<>();
+        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(base_port + i));
 
-        for (int i=10001; i<=10005; i++) addresses.add(Address.from(i));
+        new TwitterServer(id, addresses).start();
 
-        new TwitterServer(address, addresses);
-
-        //vectorClockTest();
     }
 }

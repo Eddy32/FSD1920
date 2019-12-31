@@ -68,10 +68,9 @@ public class TwitterClient {
 
     public void startCliente() throws IOException {
 
-        // Serializers
-
         // Handlers
         messagingService.registerHandler("LIST", (addr, bytes) -> {
+
 
             // Decoding list info
             Protos.List list = list_serializer.decode(bytes);
@@ -81,7 +80,6 @@ public class TwitterClient {
             }
 
         }, e);
-
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String msg;
@@ -176,24 +174,28 @@ public class TwitterClient {
             String mensagem = in.readLine();
             System.out.println("Categorias");
             ArrayList<String> arrayList = new ArrayList<String>();
-            Matcher m = Pattern.compile("#[a-zA-Z_]*")
+            Matcher m = Pattern.compile("#[a-zA-Z_0-9\\-]*")
                     .matcher(mensagem);
             while (m.find()) {
                 arrayList.add(m.group());
             }
             for (String cena : arrayList)
                 System.out.println(cena);
+            if (arrayList.size() < 1) {
+                System.out.println("Necessário pelo menos 1 categoria");
 
-            Post post = new Post(mensagem, arrayList);
+            } else {
+                Post post = new Post(mensagem, arrayList);
 
-            byte[] data = post_serializer.encode(post);
-
-            messagingService.sendAsync(servidor, "POST", data);
+                byte[] data = post_serializer.encode(post);
+                System.out.println(servidor.toString());
+                messagingService.sendAsync(servidor, "POST", data);
+            }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Formato invalido");
+            ;
         }
-
 
     }
 
@@ -217,7 +219,7 @@ public class TwitterClient {
         System.out.println("#####################################################");
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception { // args[0] Porta Cliente args[1] porta loadbalancer
 
         // Getting own port from command line
         int port = Integer.parseInt(args[0]);

@@ -6,12 +6,10 @@ public class List {
 
     private ArrayList<String> posts;
 
-    public List(ArrayList<String> posts) {
-        this.posts = posts;
-    }
+    public List(java.util.List<String> posts) { this.posts = new ArrayList<>(posts); }
 
-    public ArrayList<String> getPosts() {
-        return posts;
+    public java.util.List<String> getPosts() {
+        return (java.util.List<String>) posts;
     }
 
     public void setPosts(ArrayList<String> posts) {

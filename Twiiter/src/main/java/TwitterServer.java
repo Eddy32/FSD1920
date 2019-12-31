@@ -19,7 +19,6 @@ import java.util.stream.IntStream;
 
 public class TwitterServer {
 
-    private boolean startedElection;
     private int id;
     private int leader;
     private List<Address> addresses;
@@ -29,7 +28,6 @@ public class TwitterServer {
 
     public TwitterServer(int id, List<Address> addresses) throws Exception {
 
-        this.startedElection = false;
         this.id = id;
         this.leader = 0;
         this.addresses = addresses;
@@ -73,7 +71,6 @@ public class TwitterServer {
                 messagingService.sendAsync(this.addresses.get((this.id+1)%this.addresses.size()), "ELECTION", data);
             }
             else{
-                this.startedElection = false;
                 messagingService.sendAsync(addressReceived.getAddress(), "SHARE2LEADER", bytes);
                 System.out.println("O CAMPEAO É"  + addressReceived.getAddress().toString());
             }
@@ -219,7 +216,6 @@ public class TwitterServer {
     }
 
     public void startElection(){
-        this.startedElection = true;
         Serializer address_id_serializer = new SerializerBuilder().addType(Protos.AdressElection.class).addType(Address.class).build();
         Protos.AdressElection adressElection = new AdressElection(this.addresses.get(this.id), this.id);
          byte[] data = address_id_serializer.encode(adressElection);

@@ -15,7 +15,8 @@ public class DataBase {
 
 
     public Pair<Integer,Integer> addPost(String topic, String post){
-        int index;
+        Pair<Integer, Integer> par;
+
         ListPosts new_post;
         l.lock();
         if (this.posts.containsKey(topic) ) //Se o topico ja existir vai buscar a lista deles
@@ -25,12 +26,18 @@ public class DataBase {
             this.posts.put(topic,new_post);
         }
         l.unlock();
-
-        Pair<Integer,Integer> pair = new_post.addPost(post); //Esquerda indice que foi inserido
-        //Direita numero de voltas que ja deu ao arraylist
-        return pair;
+        par = new_post.getIndexVoltas();
+        new_post.addPost(post,par.getLeft());                       //Esquerda indice que foi inserido
+                                                                    //Direita numero de voltas que ja deu ao arraylist
+        return par;
 
     }
+
+    public synchronized ListPosts getPostsTopic(String topic){
+        return this.posts.get(topic);
+    }
+
+
 
 
 

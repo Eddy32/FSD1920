@@ -21,20 +21,28 @@ public class ListPosts {
         return this.volta;
     }
 
-    public synchronized Pair<Integer,Integer> addPost(String post){
+    public synchronized void addPost(String post,int index){
+
+        if(this.posts.size() > index){
+            this.posts.remove(index);
+        }
+        this.posts.add(index,post);
+
+
+    }
+
+    public synchronized Pair<Integer,Integer> getIndexVoltas(){
+        Pair<Integer,Integer> pair;
         if(this.index == 10){
             this.volta++;
             this.index=0;
+            pair = new Pair(this.index,this.volta);
+            return pair;
         }
-
-
-        if(this.posts.size() > this.index){
-            this.posts.remove(this.index);
+        else{
+            pair = new Pair(this.index++,this.volta);
+            return pair;
         }
-        this.posts.add(this.index,post);
-
-        Pair<Integer,Integer> pair = new Pair(this.index++,this.volta);
-        return pair;
 
     }
 
@@ -42,27 +50,28 @@ public class ListPosts {
 
     public static void main(String args[]){
         ListPosts teste = new ListPosts();
-        teste.addPost("1");
-        teste.addPost("2");
-        teste.addPost("3");
-        teste.addPost("4");
-        teste.addPost("5");
-        teste.addPost("6");
-        teste.addPost("7");
-        teste.addPost("8");
-        teste.addPost("9");
-        teste.addPost("10");
-        teste.addPost("11");
-        teste.addPost("12");
-        teste.addPost("13");
-        teste.addPost("14");
-        teste.addPost("15");
-        teste.addPost("16");
-        teste.addPost("17");
-        teste.addPost("18");
-        teste.addPost("19");
-        teste.addPost("20");
-        teste.addPost("21");
+        teste.addPost("1",teste.getIndexVoltas().getLeft());
+        teste.addPost("2",teste.getIndexVoltas().getLeft());
+        teste.addPost("3",teste.getIndexVoltas().getLeft());
+        teste.addPost("4",teste.getIndexVoltas().getLeft());
+        teste.addPost("5",teste.getIndexVoltas().getLeft());
+        teste.addPost("6",teste.getIndexVoltas().getLeft());
+        teste.addPost("7",teste.getIndexVoltas().getLeft());
+        teste.addPost("8",teste.getIndexVoltas().getLeft());
+        teste.addPost("9",teste.getIndexVoltas().getLeft());
+        teste.addPost("10",teste.getIndexVoltas().getLeft());
+        teste.addPost("11",teste.getIndexVoltas().getLeft());
+        teste.addPost("12",teste.getIndexVoltas().getLeft());
+        teste.addPost("13",teste.getIndexVoltas().getLeft());
+        teste.addPost("14",teste.getIndexVoltas().getLeft());
+        teste.addPost("15",teste.getIndexVoltas().getLeft());
+        teste.addPost("16",teste.getIndexVoltas().getLeft());
+        teste.addPost("17",teste.getIndexVoltas().getLeft());
+        teste.addPost("18",teste.getIndexVoltas().getLeft());
+        teste.addPost("19",teste.getIndexVoltas().getLeft());
+        teste.addPost("20",teste.getIndexVoltas().getLeft());
+        teste.addPost("21",teste.getIndexVoltas().getLeft());
+        teste.addPost("22",teste.getIndexVoltas().getLeft());
 
 
     }

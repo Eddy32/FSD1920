@@ -21,6 +21,10 @@ public class ListPosts {
         return this.volta;
     }
 
+    public ArrayList<String> getPosts(){
+        return this.posts;
+    }
+
     public synchronized void addPost(String post,int index){
 
         if(this.posts.size() > index){
@@ -30,6 +34,8 @@ public class ListPosts {
 
 
     }
+
+
 
     public synchronized Pair<Integer,Integer> getIndexVoltas(){
         Pair<Integer,Integer> pair;

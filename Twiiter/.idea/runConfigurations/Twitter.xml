@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Twitter" type="CompoundRunConfigurationType">
+    <toRun name="TwitterLoadBalancer (10000)" type="Application" />
+    <toRun name="TwitterServer (10002)" type="Application" />
+    <toRun name="TwitterServer (10004)" type="Application" />
+    <toRun name="TwitterServer (10001)" type="Application" />
+    <toRun name="TwitterClient (9000)" type="Application" />
+    <toRun name="TwitterServer (10005)" type="Application" />
+    <toRun name="TwitterServer (10003)" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>

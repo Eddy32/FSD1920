@@ -1,4 +1,4 @@
-
+package Database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +8,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DataBase {
     private HashMap<String, ListPosts> posts;
     private final Lock l = new ReentrantLock();
+    private int logicCounter;
 
 
     public DataBase(){
         this.posts = new HashMap<>();
+        this.logicCounter = 0;
     }
 
 
@@ -26,8 +28,7 @@ public class DataBase {
             this.posts.put(topic,new_post);
         }
         l.unlock();
-        new_post.addPost(post,index);                       //Esquerda indice que foi inserido
-                                                            //Direita numero de voltas que ja deu ao arraylist
+        new_post.addPost(post,this.logicCounter++,index);
 
     }
 
@@ -38,9 +39,23 @@ public class DataBase {
             return 0;
     }
 
-    public synchronized ArrayList<String> getPostsTopic(String topic){
-        return this.posts.get(topic).getPosts();
+    public ArrayList<Post> getPostsTopic(String topic){
+        ArrayList<Post> order = new ArrayList<>();
+        if(this.posts.containsKey(topic)){
+            l.lock();
+            ArrayList<Post> posts =  this.posts.get(topic).getPosts(); //retorna arraylist posts
+            int index = this.posts.get(topic).getIndexNoIncrement()%10;
+            l.unlock();
+
+            int tam = posts.size();
+            for(int i = 0; i < tam; i++){
+                order.add(posts.get((index+i)%tam).clone()); //nem consigo descrever o que aqui se passou #Stonks
+            }
+        }
+        return order;
+
     }
+
 
 
 
@@ -64,6 +79,9 @@ public class DataBase {
         teste.addPost("teste","11",teste.getIndex("teste"));
         teste.addPost("teste","12",teste.getIndex("teste"));
         teste.addPost("kapa","1",teste.getIndex("kapa"));
+        ArrayList<Post> p = teste.getPostsTopic("teste");
+        ArrayList<Post> pp = teste.getPostsTopic("beta");
+
 
 
 

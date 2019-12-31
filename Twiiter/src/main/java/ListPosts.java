@@ -10,7 +10,7 @@ public class ListPosts {
     public ListPosts(){
         this.posts = new ArrayList<>();
         this.volta = 0;
-        this.index = 0;
+        this.index = 1;
     }
 
     public ListPosts(ArrayList<String> posts) {

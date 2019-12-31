@@ -32,8 +32,10 @@ public class DataBase {
     }
 
     public Pair<Integer,Integer> getIndexVoltas(String topic){
-        if(this.posts.containsKey(topic))
-            return this.posts.get(topic).getIndexVoltas();
+        if(this.posts.containsKey(topic)){
+            Pair<Integer,Integer> par  = this.posts.get(topic).getIndexVoltas();
+            return par;
+        }
         else
             return new Pair<>(0,0);
     }

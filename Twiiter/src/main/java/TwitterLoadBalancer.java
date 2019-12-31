@@ -21,7 +21,7 @@ public class TwitterLoadBalancer {
         this.address = address;
         this.addresses = addresses;
 
-        ExecutorService e = Executors.newFixedThreadPool(1);
+        ExecutorService e = Executors.newFixedThreadPool(6);
 
         // Starting messaging service
 

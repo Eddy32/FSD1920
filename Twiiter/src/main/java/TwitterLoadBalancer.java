@@ -72,7 +72,7 @@ public class TwitterLoadBalancer {
 
         // Filling a list with the addresses of those servers
         List<Address> addresses = new ArrayList<>();
-        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(1000 + i));
+        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(10000 + i));
 
         new TwitterLoadBalancer(address, addresses).start();
 

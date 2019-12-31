@@ -226,15 +226,15 @@ public class TwitterClient {
         System.out.println("#####################################################");
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception { // args[0] Porta Cliente args[1] porta loadbalancer
 
         // Getting port from command line
-        int port =  10001; // Integer.parseInt(args[0]);
+        int port =  Integer.parseInt(args[0]); // Integer.parseInt(args[0]);
 
         // Making an Address based on the command line arguments
         Address address = Address.from(port);
 
-        new TwitterClient(address, Address.from(10000) );
+        new TwitterClient(address, Address.from(Integer.parseInt(args[1])) );
 
         //vectorClockTest();
     }

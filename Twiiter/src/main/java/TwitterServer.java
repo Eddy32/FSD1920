@@ -7,6 +7,7 @@ import io.atomix.utils.serializer.SerializerBuilder;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.IntStream;
 
 public class TwitterServer {
 
+    private boolean startedElection;
     private int id;
     private int leader;
     private List<Address> addresses;
@@ -26,6 +28,7 @@ public class TwitterServer {
 
     public TwitterServer(int id, List<Address> addresses) throws Exception {
 
+        this.startedElection = false;
         this.id = id;
         this.leader = 0;
         this.addresses = addresses;
@@ -34,12 +37,12 @@ public class TwitterServer {
         this.serverQueue = new ArrayList<>();
         for (int i=0; i<addresses.size(); i++) serverQueue.add(new TreeMap<>());
 
-        ExecutorService e = Executors.newFixedThreadPool(6);
+        ExecutorService e = Executors.newFixedThreadPool(1);
 
         // Starting messaging service
         messagingService = new NettyMessagingService.Builder()
-                .withName("Twitter_Server_" + id)
-                .withReturnAddress(addresses.get(id)).build();
+                .withName("Twitter_Server_" + this.addresses.get(this.id).toString())
+                .withReturnAddress(this.addresses.get(id)).build();
 
         // Serializers
         Serializer post_serializer = new SerializerBuilder().addType(Protos.Post.class).build();
@@ -47,10 +50,69 @@ public class TwitterServer {
         Serializer update_serializer = new SerializerBuilder().addType(Protos.Update.class).build();
         Serializer get_serializer = new SerializerBuilder().addType(Protos.Get.class).build();
         Serializer list_serializer = new SerializerBuilder().addType(Protos.List.class).build();
+        Serializer election_serializer = new SerializerBuilder().addType(Address.class).build();
+
+
+
+
+
+
+        //When election is started - send message to other servers with port, find the highest #420
+        messagingService.registerHandler("ELECTION", (addr,bytes)-> {
+            System.out.println("ELEIÇÂOOOOOOO! recebi do "  + addr.toString());
+
+            Address addressReceived =  election_serializer.decode(bytes);
+            if(!this.startedElection){
+                // Decoding post info
+                int portReceived = addressReceived.port();
+
+                byte[] data;
+
+                if(this.addresses.get(this.id).port() > portReceived ){
+                    data = election_serializer.encode(this.addresses.get(this.id));
+                }
+                else{
+                    data = bytes; // election_serializer.encode(portReceived);
+                }
+
+
+                messagingService.sendAsync(this.addresses.get((this.id+1)%this.addresses.size()), "ELECTION", data);
+            }
+            else{
+                this.startedElection = false;
+                messagingService.sendAsync(addressReceived, "SHARE2LEADER", bytes);
+                System.out.println("O CAMPEAO É"  + addressReceived.toString());
+
+
+            }
+
+        }, e);
+
+        //Tell the Server he is the new leader
+        messagingService.registerHandler("SHARE2LEADER", (addr,bytes)-> {
+            System.out.println("SOU LIDER: " + this.addresses.get(this.id));
+            this.leader = this.id;
+            Address addressReceived =  election_serializer.decode(bytes);
+            for(Address a: this.addresses)
+                if(!a.equals(addressReceived))
+                    messagingService.sendAsync(a, "SHARE", bytes);
+        }, e);
+
+        //Share the new leader with every server
+        messagingService.registerHandler("SHARE", (addr,bytes)-> {
+            Address addressReceived =  election_serializer.decode(bytes);
+            this.leader = this.addresses.indexOf(addressReceived);
+            System.out.println("O meu novo lider é: " + this.leader + "::" + addressReceived.toString());
+
+        }, e);
+
+
+
+
 
         // When a POST message is received
         messagingService.registerHandler("POST", (addr,bytes)-> {
-
+            System.out.println("RECEBI!!");
             // Decoding post info
             Protos.Post post = post_serializer.decode(bytes);
 
@@ -69,7 +131,7 @@ public class TwitterServer {
             }
 
         }, e);
-
+/*
         // When a TRY UPDATE message is received
         messagingService.registerHandler("TRY_UPDATE", (addr,bytes)-> {
 
@@ -147,9 +209,12 @@ public class TwitterServer {
             messagingService.sendAsync(addr, "LIST", data);
 
         }, e);
+*/      messagingService.start();
+        Thread.sleep(10000);
+        System.out.println("ACORDEI :D");
+        startElection();
 
     }
-
     public void start () {
 
         messagingService.start();
@@ -162,8 +227,20 @@ public class TwitterServer {
 
     }
 
+    public void startElection(){
+        this.startedElection = true;
+
+        Serializer election_serializer = new SerializerBuilder().addType(Address.class).build();
+        byte[] data = election_serializer.encode(this.addresses.get(this.id));
+        messagingService.sendAsync(this.addresses.get((this.id+1)%this.addresses.size()), "ELECTION", data);
+
+
+    }
+
 
     public static void main(String[] args) throws Exception {
+
+
 
         // Getting id from command line
         int id = Integer.parseInt(args[0]);
@@ -176,6 +253,7 @@ public class TwitterServer {
 
         // Filling a list with the addresses of those servers
         List<Address> addresses = new ArrayList<>();
+      //  for (int i=1; i<=no_addresses; i++) addresses.add(new Address("MBP-de-Pedro.lan",base_port+i, ));
         for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(base_port + i));
 
         new TwitterServer(id, addresses).start();

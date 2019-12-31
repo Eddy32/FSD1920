@@ -5,13 +5,11 @@ public class Update {
     private String text;
     private String category;
     private int index;
-    private int iterator;
 
-    public Update(String text, String category, int index, int iterator) {
+    public Update(String text, String category, int index) {
         this.text = text;
         this.category = category;
         this.index = index;
-        this.iterator = iterator;
     }
 
     public String getText() {
@@ -26,10 +24,6 @@ public class Update {
         return index;
     }
 
-    public int getIterator() {
-        return iterator;
-    }
-
     public void setText(String text) {
         this.text = text;
     }
@@ -40,10 +34,6 @@ public class Update {
 
     public void setIndex(int index) {
         this.index = index;
-    }
-
-    public void setIterator(int iterator) {
-        this.iterator = iterator;
     }
 
 }

@@ -3,7 +3,7 @@ import java.util.stream.IntStream;
 
 public class VectorClock {
 
-    private int id;
+    private final int id;
     private int[] clock;
 
     public VectorClock (int id, int vcSize) {
@@ -13,26 +13,9 @@ public class VectorClock {
 
     }
 
-    public void increment () { ++clock[id]; }
-
-    public void update (VectorClock vectorClock) {
-
-        if (IntStream.range(0, clock.length)
-                .filter(i -> i != id)
-                .allMatch(i -> this.clock[i] <= vectorClock.clock[i])) {
-
-            // Updating the local vector clock
-            int id_value = this.clock[id];
-            this.clock = vectorClock.clock;
-            this.clock[id] = id_value;
-
-        }
-
-    }
+    public synchronized int increment () { return ++clock[id]; }
 
     public int getId() { return id; }
-
-    public int getSelf() { return clock[id]; }
 
     public int getClock (int index) { return clock[index];}
 

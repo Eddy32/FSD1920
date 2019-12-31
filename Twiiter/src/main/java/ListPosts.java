@@ -42,7 +42,7 @@ public class ListPosts {
         if(this.index == 10){
             this.volta++;
             this.index=0;
-            pair = new Pair(this.index,this.volta);
+            pair = new Pair(this.index++,this.volta);
             return pair;
         }
         else{

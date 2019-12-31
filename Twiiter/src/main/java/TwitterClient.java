@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,7 +74,6 @@ public class TwitterClient {
 
         public void startCliente() throws IOException {
 
-            // Serializers
 
             // Handlers
             messagingService.registerHandler("LIST", (addr, bytes) -> {
@@ -114,7 +114,7 @@ public class TwitterClient {
                     //tipo_menu = resultado;
 
                 }catch (Exception e){
-                    e.printStackTrace();
+                    System.out.println("Formato invalido");;
                 }
 
 
@@ -181,22 +181,26 @@ public class TwitterClient {
                 String mensagem = in.readLine();
                 System.out.println("Categorias");
                 ArrayList<String> arrayList = new ArrayList<String>();
-                Matcher m = Pattern.compile("#[a-zA-Z_]*")
+                Matcher m = Pattern.compile("#[a-zA-Z_0-9\\-]*")
                         .matcher(mensagem);
                 while (m.find()) {
                     arrayList.add(m.group());
                 }
                 for (String cena : arrayList)
                     System.out.println(cena);
+                if( arrayList.size() < 1){
+                    System.out.println("Necessário pelo menos 1 categoria");
 
-                Post post = new Post(mensagem, arrayList);
+                }else{
+                    Post post = new Post(mensagem, arrayList);
 
-                byte[] data = post_serializer.encode(post);
-
-                messagingService.sendAsync(servidor, "POST", data);
+                    byte[] data = post_serializer.encode(post);
+                    System.out.println(servidor.toString());
+                    messagingService.sendAsync(servidor, "POST", data);
+                }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Formato invalido");;
             }
 
 

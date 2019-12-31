@@ -32,8 +32,10 @@ public class DataBase {
     }
 
     public Pair<Integer,Integer> getIndexVoltas(String topic){
-        
-        return this.posts.get(topic).getIndexVoltas();
+        if(this.posts.containsKey(topic))
+            return this.posts.get(topic).getIndexVoltas();
+        else
+            return new Pair<>(0,0);
     }
 
     public synchronized ArrayList<String> getPostsTopic(String topic){
@@ -49,20 +51,20 @@ public class DataBase {
         DataBase teste = new DataBase();
         teste.addPost("teste","1",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","2",teste.getIndexVoltas("teste").getLeft());
-        teste.addPost("beta","1",teste.getIndexVoltas("teste").getLeft());
+        teste.addPost("beta","1",teste.getIndexVoltas("beta").getLeft());
         teste.addPost("teste","3",teste.getIndexVoltas("teste").getLeft());
-        teste.addPost("beta","2",teste.getIndexVoltas("teste").getLeft());
+        teste.addPost("beta","2",teste.getIndexVoltas("beta").getLeft());
         teste.addPost("teste","4",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","5",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","6",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","7",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","8",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","9",teste.getIndexVoltas("teste").getLeft());
-        teste.addPost("beta","3",teste.getIndexVoltas("teste").getLeft());
+        teste.addPost("beta","3",teste.getIndexVoltas("beta").getLeft());
         teste.addPost("teste","10",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","11",teste.getIndexVoltas("teste").getLeft());
         teste.addPost("teste","12",teste.getIndexVoltas("teste").getLeft());
-        teste.addPost("kapa","1",teste.getIndexVoltas("teste").getLeft());
+        teste.addPost("kapa","1",teste.getIndexVoltas("kapa").getLeft());
 
 
 

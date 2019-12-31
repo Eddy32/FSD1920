@@ -21,7 +21,7 @@ public class TwitterLoadBalancer {
         this.address = address;
         this.addresses = addresses;
 
-        ExecutorService e = Executors.newFixedThreadPool(1);
+        ExecutorService e = Executors.newFixedThreadPool(6);
 
         // Starting messaging service
 
@@ -72,7 +72,7 @@ public class TwitterLoadBalancer {
 
         // Filling a list with the addresses of those servers
         List<Address> addresses = new ArrayList<>();
-        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(1000 + i));
+        for (int i=1; i<=no_addresses; i++) addresses.add(Address.from(10000 + i));
 
         new TwitterLoadBalancer(address, addresses).start();
 

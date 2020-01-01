@@ -109,7 +109,7 @@ public class TwitterClient {
                             list_posts();
                             break;
                         default:
-                            System.out.printf("Opcao invalida");
+                            System.out.println("Opcao invalida");
                     }
                     //tipo_menu = resultado;
 
@@ -181,7 +181,7 @@ public class TwitterClient {
                 String mensagem = in.readLine();
                 System.out.println("Categorias");
                 ArrayList<String> arrayList = new ArrayList<String>();
-                Matcher m = Pattern.compile("#[a-zA-Z_0-9\\-]*")
+                Matcher m = Pattern.compile("#[-_'a-zA-ZÀ-ÖØ-öø-ÿ]*")
                         .matcher(mensagem);
                 while (m.find()) {
                     arrayList.add(m.group());

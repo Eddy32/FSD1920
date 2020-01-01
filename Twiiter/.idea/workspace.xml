@@ -2,10 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d5cc674-2b21-4593-963b-8eda5421f088" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/Twitter.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Database/Pair.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Database/Post.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AtomixChat.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/DataBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ListPosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/ListPosts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/List.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/List.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/Update.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/Update.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/TwitterClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/VectorClock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VectorClock.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,98 +68,42 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.TwitterClient">
-    <configuration name="AtomixChat (10001)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="AtomixChat" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="10001" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AtomixChat (10002)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="AtomixChat" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="10002" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AtomixChat (10003)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="AtomixChat" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="10003" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AtomixChat (10004)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="AtomixChat" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="10004" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AtomixChat (10005)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="AtomixChat" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="10005" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Coordinator (2PC)" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="TwoPhaseCommit" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="0 10000 10001 10002" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Participant 0 (2PC)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwoPhaseCommit" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="1 10000 10001 10002" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Participant 1 (2PC)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwoPhaseCommit" />
-      <module name="Chat" />
-      <option name="PROGRAM_PARAMETERS" value="2 10000 10001 10002" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Server2" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+    <configuration name="TwitterClient (9000)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
       <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="1 10000 5" />
+      <option name="PROGRAM_PARAMETERS" value="9000 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Server3" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+    <configuration name="TwitterClient (9001)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
       <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="2 10000 5" />
+      <option name="PROGRAM_PARAMETERS" value="9001 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Server4" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+    <configuration name="TwitterClient (9002)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
       <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="3 10000 5" />
+      <option name="PROGRAM_PARAMETERS" value="9002 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Server5" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+    <configuration name="TwitterClient (9003)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
       <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="4 10000 5" />
+      <option name="PROGRAM_PARAMETERS" value="9003 10000" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwitterClient (9004)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="9004 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -162,10 +116,58 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TwitterLoadBalancer (10000)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterLoadBalancer" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="10000 5" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TwitterLoadBalancer" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="TwitterLoadBalancer" />
       <module name="Twiiter" />
       <option name="PROGRAM_PARAMETERS" value="10000 5" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwitterServer (10001)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="0 10000 5" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwitterServer (10002)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="1 10000 5" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwitterServer (10003)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="2 10000 5" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwitterServer (10004)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="3 10000 5" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TwitterServer (10005)" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
+      <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="4 10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -199,29 +201,23 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Application.AtomixChat (10001)" />
-      <item itemvalue="Application.AtomixChat (10002)" />
-      <item itemvalue="Application.AtomixChat (10003)" />
-      <item itemvalue="Application.AtomixChat (10004)" />
-      <item itemvalue="Application.AtomixChat (10005)" />
-      <item itemvalue="Application.Participant 0 (2PC)" />
-      <item itemvalue="Application.Participant 1 (2PC)" />
-      <item itemvalue="Application.TwitterServer" />
-      <item itemvalue="Application.Server2" />
-      <item itemvalue="Application.Server3" />
-      <item itemvalue="Application.Server4" />
-      <item itemvalue="Application.Server5" />
-      <item itemvalue="Application.TwitterLoadBalancer" />
       <item itemvalue="Application.TwitterClient" />
-      <item itemvalue="Application.Coordinator (2PC)" />
+      <item itemvalue="Application.TwitterLoadBalancer" />
+      <item itemvalue="Application.TwitterServer" />
+      <item itemvalue="Application.TwitterServer (10001)" />
+      <item itemvalue="Application.TwitterServer (10002)" />
+      <item itemvalue="Application.TwitterServer (10003)" />
+      <item itemvalue="Application.TwitterServer (10004)" />
+      <item itemvalue="Application.TwitterServer (10005)" />
+      <item itemvalue="Application.TwitterLoadBalancer (10000)" />
+      <item itemvalue="Application.TwitterClient (9000)" />
+      <item itemvalue="Application.TwitterClient (9001)" />
+      <item itemvalue="Application.TwitterClient (9002)" />
+      <item itemvalue="Application.TwitterClient (9003)" />
+      <item itemvalue="Application.TwitterClient (9004)" />
       <item itemvalue="Compound.Unnamed" />
+      <item itemvalue="Compound.Twitter" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.Coordinator (2PC)" />
-        <item itemvalue="Application.AtomixChat (10001)" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -273,19 +269,63 @@
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state x="342" y="67" width="671" height="659" key="#TwitterClient/0.27.1366.741@0.27.1366.741" timestamp="1577810765971" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9000)" timestamp="1577898726553">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9000)/0.27.1366.741@0.27.1366.741" timestamp="1577898726553" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9001)" timestamp="1577907460554">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9001)/0.27.1366.741@0.27.1366.741" timestamp="1577907460554" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9002)" timestamp="1577907488619">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9002)/0.27.1366.741@0.27.1366.741" timestamp="1577907488619" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9003)" timestamp="1577907481178">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9003)/0.27.1366.741@0.27.1366.741" timestamp="1577907481178" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9004)" timestamp="1577907500132">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterClient_(9004)/0.27.1366.741@0.27.1366.741" timestamp="1577907500132" />
     <state x="-1258" y="228" key="#TwitterLoadBalancer" timestamp="1577795140755">
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
     <state x="-1258" y="228" key="#TwitterLoadBalancer/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577795140755" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterLoadBalancer_(10000)" timestamp="1577898749063">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterLoadBalancer_(10000)/0.27.1366.741@0.27.1366.741" timestamp="1577898749063" />
     <state x="-657" y="204" key="#TwitterServer" timestamp="1577793344696">
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
     <state x="-657" y="204" key="#TwitterServer/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577793344696" />
-    <state x="282" y="84" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577810671673">
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10001)" timestamp="1577898721102">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10001)/0.27.1366.741@0.27.1366.741" timestamp="1577898721102" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10002)" timestamp="1577898767025">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10002)/0.27.1366.741@0.27.1366.741" timestamp="1577898767025" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10003)" timestamp="1577898738146">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10003)/0.27.1366.741@0.27.1366.741" timestamp="1577898738146" />
+    <state x="341" y="50" width="671" height="685" key="#TwitterServer_(10004)" timestamp="1577898715926">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="341" y="50" width="671" height="685" key="#TwitterServer_(10004)/0.27.1366.741@0.27.1366.741" timestamp="1577898715926" />
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10005)" timestamp="1577898732745">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="54" width="671" height="685" key="#TwitterServer_(10005)/0.27.1366.741@0.27.1366.741" timestamp="1577898732745" />
+    <state x="282" y="84" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577915024493">
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state x="-1496" y="213" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798707945" />
-    <state x="282" y="84" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1366.741@0.27.1366.741" timestamp="1577810671673" />
+    <state x="282" y="84" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1366.741@0.27.1366.741" timestamp="1577915024493" />
     <state x="569" y="368" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1577785181429">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
@@ -294,26 +334,26 @@
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state x="289" y="27" width="777" height="741" key="CommitChangelistDialog2/0.27.1366.741@0.27.1366.741" timestamp="1577809818200" />
-    <state width="1320" height="273" key="GridCell.Tab.0.bottom" timestamp="1577810807341">
+    <state width="1320" height="273" key="GridCell.Tab.0.bottom" timestamp="1577915677872">
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.bottom/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788957" />
-    <state width="1320" height="273" key="GridCell.Tab.0.bottom/0.27.1366.741@0.27.1366.741" timestamp="1577810807341" />
-    <state width="1320" height="273" key="GridCell.Tab.0.center" timestamp="1577810807340">
+    <state width="1320" height="273" key="GridCell.Tab.0.bottom/0.27.1366.741@0.27.1366.741" timestamp="1577915677872" />
+    <state width="1320" height="273" key="GridCell.Tab.0.center" timestamp="1577915677871">
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.center/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788955" />
-    <state width="1320" height="273" key="GridCell.Tab.0.center/0.27.1366.741@0.27.1366.741" timestamp="1577810807340" />
-    <state width="1320" height="273" key="GridCell.Tab.0.left" timestamp="1577810807338">
+    <state width="1320" height="273" key="GridCell.Tab.0.center/0.27.1366.741@0.27.1366.741" timestamp="1577915677871" />
+    <state width="1320" height="273" key="GridCell.Tab.0.left" timestamp="1577915677869">
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.left/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788954" />
-    <state width="1320" height="273" key="GridCell.Tab.0.left/0.27.1366.741@0.27.1366.741" timestamp="1577810807338" />
-    <state width="1320" height="273" key="GridCell.Tab.0.right" timestamp="1577810807340">
+    <state width="1320" height="273" key="GridCell.Tab.0.left/0.27.1366.741@0.27.1366.741" timestamp="1577915677869" />
+    <state width="1320" height="273" key="GridCell.Tab.0.right" timestamp="1577915677871">
       <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.right/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788956" />
-    <state width="1320" height="273" key="GridCell.Tab.0.right/0.27.1366.741@0.27.1366.741" timestamp="1577810807340" />
+    <state width="1320" height="273" key="GridCell.Tab.0.right/0.27.1366.741@0.27.1366.741" timestamp="1577915677871" />
     <state width="1878" height="357" key="GridCell.Tab.1.bottom" timestamp="1577795982902">
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
@@ -330,8 +370,5 @@
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
     <state width="1878" height="357" key="GridCell.Tab.1.right/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577795982902" />
-  </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Twiiter$Server3.ic" NAME="Server3 Coverage Results" MODIFIED="1577795724710" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

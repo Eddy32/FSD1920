@@ -1,25 +1,22 @@
+import Protos.Get;
+import Protos.List;
+import Protos.Post;
 import io.atomix.cluster.messaging.ManagedMessagingService;
-import io.atomix.cluster.messaging.MessagingService;
 import io.atomix.cluster.messaging.impl.NettyMessagingService;
 import io.atomix.utils.net.Address;
 import io.atomix.utils.serializer.Serializer;
 import io.atomix.utils.serializer.SerializerBuilder;
-import org.apache.commons.math3.analysis.function.Add;
-
-import Protos.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 public class TwitterClient {
 
@@ -32,15 +29,13 @@ public class TwitterClient {
     private Serializer get_serializer = new SerializerBuilder().addType(Get.class).build();
     private Serializer list_serializer = new SerializerBuilder().addType(List.class).build();
 
-    public TwitterClient(Address address, Address servidor ) throws Exception {
-
+    public TwitterClient(Address address, Address servidor) throws Exception {
         this.address = address;
-        this.e = Executors.newFixedThreadPool(1);
+        this.e = Executors.newFixedThreadPool(2);
         this.categories = new ArrayList<>();
-        // Starting messaging service
 
         this.messagingService = new NettyMessagingService.Builder()
-                .withName("Chat_" + address.toString())
+                .withName("Twitter_Client_" + address.toString())
                 .withReturnAddress(address).build();
 
         messagingService.start();
@@ -49,13 +44,14 @@ public class TwitterClient {
         Serializer s = new SerializerBuilder().addType(Address.class).build();
 
         // Register Handler for when a message is received
-        messagingService.registerHandler("ADDRESS", (addr,bytes)-> {
+        messagingService.registerHandler("ADDRESS", (addr, bytes) -> {
 
             // Decoding data received
             Address msg = s.decode(bytes);
             this.servidor = msg;
+
             // Printing it
-            System.out.println("Ip servidor = " + msg.toString());
+            System.out.println("Server = " + msg.toString());
             try {
                 startCliente(); // msg = address
             } catch (IOException ex) {
@@ -63,64 +59,61 @@ public class TwitterClient {
             }
         }, e);
 
+        // Handlers
+        messagingService.registerHandler("LIST", (addr, bytes) -> {
+            System.out.println("Recebi LIST");
+
+            // Decoding list info
+            Protos.List list = list_serializer.decode(bytes);
+            int i = 0;
+            for (String post : list.getPosts()) {
+                System.out.println(i++ + "-> " + post);
+            }
+        }, e);
+
+        // Creating the message and serializing it
+        byte[] data = s.encode("");
+        // Sending the message to every client but itself
+        messagingService.sendAsync(servidor, "GET_ADDR", data);
+
+    }
+
+    public void startCliente() throws IOException {
 
 
-         // Creating the message and serializing it
-         byte[] data = s.encode("");
-         // Sending the message to every client but itself
-         messagingService.sendAsync(servidor, "GET_ADDR", data);
 
-        }
-
-        public void startCliente() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        String msg;
+        int resultado = 0;
 
 
-            // Handlers
-            messagingService.registerHandler("LIST", (addr, bytes) -> {
-
-                // Decoding list info
-                Protos.List list = list_serializer.decode(bytes);
-                int i = 0;
-                for (String post : list.getPosts()){
-                    System.out.println(i++ + "-> " + post);
+        while (true) {
+            print_menu();
+            if ((msg = in.readLine()).toUpperCase().equals("EXIT")) break;
+            try {
+                resultado = Integer.parseInt(msg);
+                switch (resultado) {
+                    case 1:
+                        send_post(in);
+                        break;
+                    case 2:
+                        deal_subscriptions(in);
+                        break;
+                    case 3:
+                        list_posts();
+                        break;
+                    default:
+                        System.out.println("Opcao invalida");
                 }
+                //tipo_menu = resultado;
 
-            }, e);
-
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            String msg;
-            int resultado = 0;
-
-
-            while (true) {
-                print_menu();
-                if ( (msg = in.readLine()).toUpperCase().equals("EXIT") ) break;
-                try{
-                    resultado = Integer.parseInt(msg);
-                    switch (resultado){
-                        case 1:
-                            send_post(in);
-                            break;
-                        case 2:
-                            deal_subscriptions(in);
-                            break;
-                        case 3:
-                            list_posts();
-                            break;
-                        default:
-                            System.out.println("Opcao invalida");
-                    }
-                    //tipo_menu = resultado;
-
-                }catch (Exception e){
-                    System.out.println("Formato invalido");;
-                }
-
-
+            } catch (Exception e) {
+                System.out.println("Formato invalido");
+                ;
             }
 
         }
+    }
 
     private void deal_subscriptions(BufferedReader in) {
         String msg;
@@ -132,8 +125,8 @@ public class TwitterClient {
                 print_deal_subscriptions();
                 msg = in.readLine();
                 lido = Integer.parseInt(msg);
-                if (lido == 4 ) break;
-                switch (lido){
+                if (lido == 4) break;
+                switch (lido) {
                     case 1:
                         System.out.println("Inserir Categoria");
                         msg = in.readLine();
@@ -142,9 +135,9 @@ public class TwitterClient {
                     case 2:
                         System.out.println("Categoria a remover");
                         msg = in.readLine();
-                        if (categories.contains(msg)){
+                        if (categories.contains(msg)) {
                             categories.remove(categories.indexOf(msg));
-                        } else{
+                        } else {
                             System.out.println("Categoria não subscrita");
                             System.out.println("Categorias subscritas são");
                             print_categories();
@@ -171,7 +164,7 @@ public class TwitterClient {
         System.out.println("#####################################################");
     }
 
-    private void print_categories(){
+    private void print_categories() {
         System.out.println(categories.toString());
     }
 
@@ -181,7 +174,7 @@ public class TwitterClient {
                 String mensagem = in.readLine();
                 System.out.println("Categorias");
                 ArrayList<String> arrayList = new ArrayList<String>();
-                Matcher m = Pattern.compile("#[-_'a-zA-ZÀ-ÖØ-öø-ÿ]*")
+                Matcher m = Pattern.compile("#[-_'a-zA-ZÀ-ÖØ-öø-ÿ0-9]*")
                         .matcher(mensagem);
                 while (m.find()) {
                     arrayList.add(m.group());
@@ -193,32 +186,31 @@ public class TwitterClient {
 
                 }else{
                     Post post = new Post(mensagem, arrayList);
-
                     byte[] data = post_serializer.encode(post);
                     System.out.println(servidor.toString());
                     messagingService.sendAsync(servidor, "POST", data);
-                }
-
-            } catch (IOException e) {
-                System.out.println("Formato invalido");;
             }
 
-
+        } catch (IOException e) {
+            System.out.println("Formato invalido");
         }
 
-    public void list_posts(){
-        if (categories.size() == 0){
+    }
+
+    public void list_posts() {
+        if (categories.size() == 0) {
             System.out.println("Sem categorias selecionadas");
-        }else{
+        } else {
             Get get = new Get(categories);
 
             byte[] data = get_serializer.encode(get);
-
+            System.out.println("Esperar pela resposta do servidor");
             messagingService.sendAsync(servidor, "GET", data);
+
         }
     }
 
-    public void print_menu(){
+    public void print_menu() {
         System.out.println("#####################################################");
         System.out.println("# 1 - Fazer um Post                                 #");
         System.out.println("# 2 - Adicionar/Remover subscricoes                 #");
@@ -228,14 +220,13 @@ public class TwitterClient {
 
     public static void main(String[] args) throws Exception { // args[0] Porta Cliente args[1] porta loadbalancer
 
-        // Getting port from command line
-        int port =  Integer.parseInt(args[0]); // Integer.parseInt(args[0]);
+        // Getting own port from command line
+        int port = Integer.parseInt(args[0]);
 
-        // Making an Address based on the command line arguments
-        Address address = Address.from(port);
+        // Getting load balancer port from command line
+        int load_balancer = Integer.parseInt(args[1]);
 
-        new TwitterClient(address, Address.from(Integer.parseInt(args[1])) );
+        new TwitterClient(Address.from(port), Address.from(load_balancer));
 
-        //vectorClockTest();
     }
 }

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d5cc674-2b21-4593-963b-8eda5421f088" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
@@ -50,6 +49,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="copyright" />
   </component>
   <component name="RecentsManager">
@@ -154,9 +154,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TwitterClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="TwitterClient" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="TwitterClient" />
       <module name="Twiiter" />
+      <option name="PROGRAM_PARAMETERS" value="10009 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -177,6 +178,26 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Unnamed" type="CompoundRunConfigurationType">
+      <toRun name="Server2" type="Application" />
+      <toRun name="TwitterLoadBalancer" type="Application" />
+      <toRun name="Server4" type="Application" />
+      <toRun name="Server5" type="Application" />
+      <toRun name="TwitterServer" type="Application" />
+      <toRun name="TwitterClient" type="Application" />
+      <toRun name="Server3" type="Application" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="CompoundRunConfigurationType">
+      <toRun name="Server2" type="Application" />
+      <toRun name="TwitterLoadBalancer" type="Application" />
+      <toRun name="Server4" type="Application" />
+      <toRun name="Server5" type="Application" />
+      <toRun name="TwitterServer" type="Application" />
+      <toRun name="TwitterClient" type="Application" />
+      <toRun name="Server3" type="Application" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Application.AtomixChat (10001)" />
       <item itemvalue="Application.AtomixChat (10002)" />
@@ -191,12 +212,12 @@
       <item itemvalue="Application.Server4" />
       <item itemvalue="Application.Server5" />
       <item itemvalue="Application.TwitterLoadBalancer" />
-      <item itemvalue="Application.Coordinator (2PC)" />
       <item itemvalue="Application.TwitterClient" />
+      <item itemvalue="Application.Coordinator (2PC)" />
+      <item itemvalue="Compound.Unnamed" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.TwitterClient" />
         <item itemvalue="Application.Coordinator (2PC)" />
         <item itemvalue="Application.AtomixChat (10001)" />
       </list>
@@ -248,6 +269,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
+    <state x="342" y="67" width="671" height="659" key="#TwitterClient" timestamp="1577810765971">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="342" y="67" width="671" height="659" key="#TwitterClient/0.27.1366.741@0.27.1366.741" timestamp="1577810765971" />
     <state x="-1258" y="228" key="#TwitterLoadBalancer" timestamp="1577795140755">
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
@@ -256,30 +281,39 @@
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
     <state x="-657" y="204" key="#TwitterServer/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577793344696" />
-    <state x="-1496" y="213" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577798707945">
-      <screen x="-1920" y="23" width="1920" height="1057" />
+    <state x="282" y="84" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577810671673">
+      <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state x="-1496" y="213" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798707945" />
+    <state x="282" y="84" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1366.741@0.27.1366.741" timestamp="1577810671673" />
     <state x="569" y="368" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1577785181429">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="569" y="368" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.23.1440.877@0.23.1440.877" timestamp="1577785181429" />
-    <state width="1878" height="289" key="GridCell.Tab.0.bottom" timestamp="1577798788957">
-      <screen x="-1920" y="23" width="1920" height="1057" />
+    <state x="289" y="27" width="777" height="741" key="CommitChangelistDialog2" timestamp="1577809818200">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state x="289" y="27" width="777" height="741" key="CommitChangelistDialog2/0.27.1366.741@0.27.1366.741" timestamp="1577809818200" />
+    <state width="1320" height="273" key="GridCell.Tab.0.bottom" timestamp="1577810807341">
+      <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.bottom/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788957" />
-    <state width="1878" height="289" key="GridCell.Tab.0.center" timestamp="1577798788955">
-      <screen x="-1920" y="23" width="1920" height="1057" />
+    <state width="1320" height="273" key="GridCell.Tab.0.bottom/0.27.1366.741@0.27.1366.741" timestamp="1577810807341" />
+    <state width="1320" height="273" key="GridCell.Tab.0.center" timestamp="1577810807340">
+      <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.center/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788955" />
-    <state width="1878" height="289" key="GridCell.Tab.0.left" timestamp="1577798788954">
-      <screen x="-1920" y="23" width="1920" height="1057" />
+    <state width="1320" height="273" key="GridCell.Tab.0.center/0.27.1366.741@0.27.1366.741" timestamp="1577810807340" />
+    <state width="1320" height="273" key="GridCell.Tab.0.left" timestamp="1577810807338">
+      <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.left/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788954" />
-    <state width="1878" height="289" key="GridCell.Tab.0.right" timestamp="1577798788956">
-      <screen x="-1920" y="23" width="1920" height="1057" />
+    <state width="1320" height="273" key="GridCell.Tab.0.left/0.27.1366.741@0.27.1366.741" timestamp="1577810807338" />
+    <state width="1320" height="273" key="GridCell.Tab.0.right" timestamp="1577810807340">
+      <screen x="0" y="27" width="1366" height="741" />
     </state>
     <state width="1878" height="289" key="GridCell.Tab.0.right/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577798788956" />
+    <state width="1320" height="273" key="GridCell.Tab.0.right/0.27.1366.741@0.27.1366.741" timestamp="1577810807340" />
     <state width="1878" height="357" key="GridCell.Tab.1.bottom" timestamp="1577795982902">
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>

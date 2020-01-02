@@ -16,26 +16,29 @@ import Database.DataBase;
 
 public class TwitterServer {
 
-    private int id;
-    private int leader;
-    private List<Address> addresses;
+    private int id; // Server ID
+    private int leader; // Leader ID
+    private List<Address> addresses; // Addresses of all network servers
     private ManagedMessagingService messagingService;
-    private VectorClock vectorClock;
-    private ArrayList<TreeMap<Integer, Protos.TryUpdate>> serverQueue;
-    private DataBase postsDB;
+    private Clock clock; // Local Clock
+    private VectorClock vectorClock; // Global clock (used only by leader)
+    private ArrayList<TreeMap<Integer, Protos.TryUpdate>> serverQueue; // Array of the post queue for each server (used only by leader)
+    private DataBase postsDB; // Post database
 
     public TwitterServer(int id, List<Address> addresses) throws Exception {
 
         this.id = id;
         this.leader = 0;
         this.addresses = addresses;
-        this.vectorClock = new VectorClock(id, addresses.size());
+
+        this.vectorClock = new VectorClock(addresses.size());
+        this.clock = new Clock();
         this.postsDB = new DataBase();
 
         this.serverQueue = new ArrayList<>();
         for (int i=0; i<addresses.size(); i++) serverQueue.add(new TreeMap<>());
 
-        ExecutorService e = Executors.newFixedThreadPool(6);
+        ExecutorService e = Executors.newFixedThreadPool(12);
 
         // Starting messaging service
         messagingService = new NettyMessagingService.Builder()
@@ -111,7 +114,7 @@ public class TwitterServer {
             // PRINTING
 
             StringBuffer post_print = new StringBuffer();
-            post_print.append("POST (" + addr.port() + "): ( ");
+            post_print.append("RECEIVED POST FROM " + addr.port() + ": ( ");
             for (String t: post_topics) post_print.append(t + " ");
             post_print.append(") -> " + post_text);
 
@@ -120,7 +123,10 @@ public class TwitterServer {
             // Sending try updates by topic
             for (String topic: post_topics) {
 
-                Protos.TryUpdate try_update = new Protos.TryUpdate(topic, post_text, vectorClock.getId(), vectorClock.increment());
+                int post_clock = clock.increment();
+                System.out.println("SENDING TRY UPDATE TO " + addresses.get(leader).port() + ": (" + topic + ") -> " + post_text + " || Clock = " + post_clock);
+
+                Protos.TryUpdate try_update = new Protos.TryUpdate(post_text, topic, id, post_clock);
 
                 byte[] data = try_update_serializer.encode(try_update);
 
@@ -143,6 +149,8 @@ public class TwitterServer {
 
             if (serverClock == vectorClock.getClock(serverId) + 1) {
 
+                System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
+
                 // Getting index for post topic
                 Integer index = this.postsDB.getIndex(post_topic);
 
@@ -150,11 +158,10 @@ public class TwitterServer {
                 Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
                 byte[] data = update_serializer.encode(broadcast);
                 messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
-
-                System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text);
+                vectorClock.increment(serverId);
 
                 // Sending the following posts in the queue for broadcast
-                for (int i = serverClock + 1; !serverQueue.get(serverId).containsKey(i); i++) {
+                for (int i = serverClock + 1; serverQueue.get(serverId).containsKey(i); i++) {
 
                     try_update = serverQueue.get(serverId).remove(i);
 
@@ -162,18 +169,19 @@ public class TwitterServer {
                     post_topic = try_update.getCategory();
                     index = this.postsDB.getIndex(post_topic);
 
+                    System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
+
                     broadcast = new Protos.Update(post_text, post_topic, index);
                     data = update_serializer.encode(broadcast);
                     messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
-
-                    System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text);
+                    vectorClock.increment(serverId);
 
                 }
 
             } else {
 
                 // PRINTING
-                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": ( " + post_topic + " ) -> " + post_text);
+                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
 
                 // Adding to queue
                 serverQueue.get(serverId).put(serverClock, try_update);
@@ -221,25 +229,42 @@ public class TwitterServer {
             ArrayList<Database.Post> mostRecent = new ArrayList<>();
 
             ArrayList<String> post_topics = get.getCategories();
-            for (String topic: post_topics)
 
-                for (Database.Post post: this.postsDB.getPostsTopic(topic))
+            // PRINTING
 
-                    if (mostRecent.size() < 10) mostRecent.add(post);
+            StringBuffer post_print = new StringBuffer();
+            post_print.append("GETTING LIST FOR TOPICS: ");
+            for (String t: post_topics) post_print.append(t + " ");
+
+            System.out.println(post_print.toString());
+
+            for (String topic: post_topics) {
+
+                System.out.println("Checking topic : " + topic);
+
+                for (Database.Post post : this.postsDB.getPostsTopic(topic)) {
+
+                    System.out.println("Checking post : " + post.getPost());
+
+                    if (mostRecent.size() < 10) { System.out.println("Adding post to most recents"); mostRecent.add(post); }
 
                     else {
 
+                        System.out.println("Already collected 10 posts: " + mostRecent.size());
+
                         boolean added = false;
 
-                        for (int i=0; i<10; i++) {
+                        for (int i = 0; i < 10; i++) {
 
                             Database.Post postInRecents = mostRecent.get(i);
 
                             if (postInRecents.getGlobalCounter() > post.getGlobalCounter()) break;
                             else {
 
-                                // Shift to the right array
-                                for (int j=i; j<9; j++) mostRecent.add(j+1, mostRecent.get(j));
+                                System.out.println("Adding post to most recents and shifting array");
+
+                                // Shift array to the right
+                                for (int j = i; j < 9; j++) mostRecent.add(j + 1, mostRecent.get(j));
 
                                 // Add element
                                 mostRecent.add(i, post);
@@ -254,6 +279,18 @@ public class TwitterServer {
 
 
                     }
+                }
+            }
+
+            // PRINTING
+
+            post_print = new StringBuffer();
+            post_print.append("SENDING LIST FOR TOPICS ( ");
+            for (String t: post_topics) post_print.append(t + " ");
+            post_print.append(" ) -> ");
+            for (Post p: mostRecent) post_print.append("\"" + p.getPost() + "\" ");
+
+            System.out.println(post_print.toString());
 
             Protos.List list = new Protos.List(mostRecent.stream().map(Post::getPost).collect(Collectors.toList()));
 

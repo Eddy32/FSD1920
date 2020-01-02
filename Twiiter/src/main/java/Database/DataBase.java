@@ -33,11 +33,9 @@ public class DataBase {
 
     }
 
-    public int getIndex(String topic){
-        if(this.posts.containsKey(topic))
-            return this.posts.get(topic).getIndex();
-        else
-            return 0;
+    public synchronized int getIndex(String topic){
+        if(this.posts.containsKey(topic)) return this.posts.get(topic).getIndex();
+        else return 0;
     }
 
     public ArrayList<Post> getPostsTopic(String topic){

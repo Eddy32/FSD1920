@@ -192,6 +192,29 @@ public class TwitterServer {
                 // Adding to queue
                 serverQueue.get(serverId).put(serverClock, try_update);
 
+                // Re-checking if the value added to the queue is the next to be broadcasted
+                if (serverClock == vectorClock.getClock(serverId) + 1) {
+
+                    // Removing everything from the queue becasuse it's my turn
+                    for (int i = serverClock + 1; serverQueue.get(serverId).containsKey(i); i++) {
+
+                        try_update = serverQueue.get(serverId).remove(i);
+
+                        post_text = try_update.getText();
+                        post_topic = try_update.getCategory();
+                        int index = this.postsDB.getIndex(post_topic);
+
+                        System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
+
+                        Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
+                        byte[] data = update_serializer.encode(broadcast);
+                        messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
+                        vectorClock.increment(serverId);
+
+                    }
+
+                }
+
             }
 
         }, e);
@@ -206,7 +229,7 @@ public class TwitterServer {
             byte[] data = update_serializer.encode(post);
 
             for(Address a: addresses){
-                System.out.println("Estão todos ok?");
+                //System.out.println("Estão todos ok?");
                 messagingService.sendAsync(a,"REQUEST",data );
             }
 
@@ -223,7 +246,7 @@ public class TwitterServer {
         }, e);
 
         messagingService.registerHandler("REQUEST", (addr,bytes)-> {
-            System.out.println("ESTOU OTIMO AMIGO :) ");
+            //System.out.println("ESTOU OTIMO AMIGO :) ");
 
             messagingService.sendAsync(addr,"PREPARED",bytes);
 
@@ -235,16 +258,16 @@ public class TwitterServer {
             update2PC(post.getKey());
             if(this.confirms.get(post.getKey())==this.addresses.size()){ //garantir que ja recebeu todas as confirmaçoes
                 for(Address a: this.addresses){
-                    System.out.println("ENTAO TOMA ESTE PACOTE");
+                    //System.out.println("ENTAO TOMA ESTE PACOTE");
                     messagingService.sendAsync(a,"COMMIT",bytes);
                 }
             }
-            else System.out.println("esperando mais confirmações");
+            //else System.out.println("esperando mais confirmações");
 
         }, e);
 
         messagingService.registerHandler("COMMIT", (addr,bytes)-> {
-            System.out.println("RECEBIDO COM TODO O GOSTO :D ");
+            //System.out.println("RECEBIDO COM TODO O GOSTO :D ");
 
             Protos.Update update = update_serializer.decode(bytes);
 
@@ -271,7 +294,7 @@ public class TwitterServer {
             String post_topic = update.getCategory();
             int topicIndex = update.getIndex();
 
-            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text);
+            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex);
 
             this.postsDB.addPost(post_topic, post_text, topicIndex);
 

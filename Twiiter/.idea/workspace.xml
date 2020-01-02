@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d5cc674-2b21-4593-963b-8eda5421f088" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Twitter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Twitter.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,10 +55,22 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Compound.Twitter">
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.6- TwitterClient (9000)">
     <configuration name="0- TwitterServer (10001)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="0 10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -67,7 +78,7 @@
     </configuration>
     <configuration name="1 - TwitterServer (10002)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="1 10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -75,15 +86,23 @@
     </configuration>
     <configuration name="10 -TwitterClient (9004)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="9002 10000" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="11 - TwitterBot (8000)" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="TwitterBot" />
+      <module name="Twitter" />
+      <option name="PROGRAM_PARAMETERS" value="8000 10000 10 10 10" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="2 - TwitterServer (10003)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="2 10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -91,7 +110,7 @@
     </configuration>
     <configuration name="3- TwitterServer (10004)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="3 10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -99,7 +118,7 @@
     </configuration>
     <configuration name="4- TwitterServer (10005)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="4 10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -107,7 +126,7 @@
     </configuration>
     <configuration name="5 - TwitterLoadBalancer (10000)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterLoadBalancer" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="10000 5" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -115,7 +134,7 @@
     </configuration>
     <configuration name="6- TwitterClient (9000)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="9000 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -123,7 +142,7 @@
     </configuration>
     <configuration name="7- TwitterClient (9001)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
+      <module name="Twitter" />
       <option name="PROGRAM_PARAMETERS" value="9001 10000" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -145,110 +164,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TwitterClient (9000)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="9000 10000" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterClient (9001)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="9001 10000" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterClient (9003)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="9003 10000" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterClient (9004)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="9004 10000" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterClient" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="TwitterClient" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="10009 10000" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterLoadBalancer (10000)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterLoadBalancer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterLoadBalancer" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="TwitterLoadBalancer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterServer (10002)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="1 10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterServer (10003)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="2 10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterServer (10004)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="3 10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterServer (10005)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="4 10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TwitterServer" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="TwitterServer" />
-      <module name="Twiiter" />
-      <option name="PROGRAM_PARAMETERS" value="0 10000 5" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Unnamed" type="CompoundRunConfigurationType">
-      <toRun name="Server2" type="Application" />
-      <toRun name="TwitterLoadBalancer" type="Application" />
-      <toRun name="Server4" type="Application" />
-      <toRun name="Server5" type="Application" />
-      <toRun name="TwitterServer" type="Application" />
-      <toRun name="TwitterClient" type="Application" />
-      <toRun name="Server3" type="Application" />
+    <configuration name="TwitterServersOnly" type="CompoundRunConfigurationType">
+      <toRun name="4- TwitterServer (10005)" type="Application" />
+      <toRun name="1 - TwitterServer (10002)" type="Application" />
+      <toRun name="0- TwitterServer (10001)" type="Application" />
+      <toRun name="2 - TwitterServer (10003)" type="Application" />
+      <toRun name="3- TwitterServer (10004)" type="Application" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="CompoundRunConfigurationType">
@@ -262,19 +183,7 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Application.TwitterClient" />
-      <item itemvalue="Application.TwitterClient (9000)" />
-      <item itemvalue="Application.TwitterClient (9001)" />
-      <item itemvalue="Application.TwitterClient (9003)" />
-      <item itemvalue="Application.TwitterClient (9004)" />
-      <item itemvalue="Application.TwitterLoadBalancer" />
-      <item itemvalue="Application.TwitterLoadBalancer (10000)" />
-      <item itemvalue="Application.TwitterServer" />
       <item itemvalue="Application.0- TwitterServer (10001)" />
-      <item itemvalue="Application.TwitterServer (10002)" />
-      <item itemvalue="Application.TwitterServer (10003)" />
-      <item itemvalue="Application.TwitterServer (10004)" />
-      <item itemvalue="Application.TwitterServer (10005)" />
       <item itemvalue="Application.1 - TwitterServer (10002)" />
       <item itemvalue="Application.2 - TwitterServer (10003)" />
       <item itemvalue="Application.3- TwitterServer (10004)" />
@@ -285,21 +194,15 @@
       <item itemvalue="Application.8- TwitterClient (9002)" />
       <item itemvalue="Application.9- TwitterClient (9003)" />
       <item itemvalue="Application.10 -TwitterClient (9004)" />
-      <item itemvalue="Compound.Unnamed" />
-      <item itemvalue="Compound.Twitter" />
+      <item itemvalue="Application.11 - TwitterBot (8000)" />
+      <item itemvalue="Compound.TwitterWithClients" />
+      <item itemvalue="Compound.TwitterServersOnly" />
     </list>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
+    <recent_temporary>
       <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
+        <item itemvalue="Application.11 - TwitterBot (8000)" />
       </list>
-    </option>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />

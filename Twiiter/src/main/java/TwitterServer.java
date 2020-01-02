@@ -199,6 +199,8 @@ public class TwitterServer {
         // When a BROADCAST message is received
         messagingService.registerHandler("BROADCAST", (addr,bytes)-> {
 
+
+
             int key = getTwoPC(); //id para identificar os ACK para o post
             this.confirms.put(key,0); //inicializar a 0
             Protos.Update post = update_serializer.decode(bytes);

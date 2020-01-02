@@ -154,10 +154,10 @@ public class TwitterServer {
 
             if (serverClock == vectorClock.getClock(serverId) + 1) {
 
-                System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
-
                 // Getting index for post topic
                 Integer index = this.postsDB.getIndex(post_topic);
+
+                System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
                 // Sending broadcast of current post
                 Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
@@ -175,7 +175,7 @@ public class TwitterServer {
                     post_topic = try_update.getCategory();
                     index = this.postsDB.getIndex(post_topic);
 
-                    System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
+                    System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
                     broadcast = new Protos.Update(post_text, post_topic, index);
                     data = update_serializer.encode(broadcast);
@@ -204,7 +204,7 @@ public class TwitterServer {
                         post_topic = try_update.getCategory();
                         int index = this.postsDB.getIndex(post_topic);
 
-                        System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
+                        System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
                         Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
                         byte[] data = update_serializer.encode(broadcast);
@@ -275,7 +275,7 @@ public class TwitterServer {
             String post_topic = update.getCategory();
             int topicIndex = update.getIndex();
 
-            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text);
+            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex);
 
             this.postsDB.addPost(post_topic, post_text, topicIndex);
 

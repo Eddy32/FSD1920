@@ -6,6 +6,7 @@ import io.atomix.utils.serializer.Serializer;
 import io.atomix.utils.serializer.SerializerBuilder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
@@ -13,11 +14,14 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import Database.DataBase;
+import org.apache.commons.math3.analysis.function.Add;
 
 public class TwitterServer {
 
     private int id; // Server ID
     private int leader; // Leader ID
+    private int twoPC;
+    private HashMap<Integer,Integer> confirms;
     private List<Address> addresses; // Addresses of all network servers
     private ManagedMessagingService messagingService;
     private Clock clock; // Local Clock
@@ -25,11 +29,14 @@ public class TwitterServer {
     private ArrayList<TreeMap<Integer, Protos.TryUpdate>> serverQueue; // Array of the post queue for each server (used only by leader)
     private DataBase postsDB; // Post database
 
+
     public TwitterServer(int id, List<Address> addresses) throws Exception {
 
         this.id = id;
         this.leader = 0;
+        this.twoPC = 0;
         this.addresses = addresses;
+        this.confirms = new HashMap<Integer, Integer>();
 
         this.vectorClock = new VectorClock(addresses.size());
         this.clock = new Clock();
@@ -57,7 +64,6 @@ public class TwitterServer {
 
         //When election is started - send message to other servers with port, find the highest #420
         messagingService.registerHandler("ELECTION", (addr,bytes)-> {
-
             Protos.AdressElection addressReceived =  address_id_serializer.decode(bytes);
             if(this.id != addressReceived.getId_starter()){
 
@@ -83,7 +89,6 @@ public class TwitterServer {
 
         //Tell the Server he is the new leader
         messagingService.registerHandler("SHARE2LEADER", (addr,bytes)-> {
-
             this.leader = this.id;
 
             Protos.AdressElection addressReceived =  address_id_serializer.decode(bytes);
@@ -158,6 +163,7 @@ public class TwitterServer {
                 Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
                 byte[] data = update_serializer.encode(broadcast);
                 messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
+
                 vectorClock.increment(serverId);
 
                 // Sending the following posts in the queue for broadcast
@@ -193,6 +199,18 @@ public class TwitterServer {
         // When a BROADCAST message is received
         messagingService.registerHandler("BROADCAST", (addr,bytes)-> {
 
+            int key = getTwoPC(); //id para identificar os ACK para o post
+            this.confirms.put(key,0); //inicializar a 0
+            Protos.Update post = update_serializer.decode(bytes);
+            post.setKey(key); //acrescentar ao post a chave
+            byte[] data = update_serializer.encode(post);
+
+            for(Address a: addresses){
+                System.out.println("Estão todos ok?");
+                messagingService.sendAsync(a,"REQUEST",data );
+            }
+
+            /*
             for (Address a : addresses) {
 
                 System.out.println("BROADCASTING TO " + a.port());
@@ -200,8 +218,48 @@ public class TwitterServer {
                 messagingService.sendAsync(a, "UPDATE", bytes);
 
             }
+            */
 
         }, e);
+
+        messagingService.registerHandler("REQUEST", (addr,bytes)-> {
+            System.out.println("ESTOU OTIMO AMIGO :) ");
+
+            messagingService.sendAsync(addr,"PREPARED",bytes);
+
+        }, e);
+
+        messagingService.registerHandler("PREPARED", (addr,bytes)-> {
+
+            Protos.Update post = update_serializer.decode(bytes);
+            update2PC(post.getKey());
+            if(this.confirms.get(post.getKey())==this.addresses.size()){ //garantir que ja recebeu todas as confirmaçoes
+                for(Address a: this.addresses){
+                    System.out.println("ENTAO TOMA ESTE PACOTE");
+                    messagingService.sendAsync(a,"COMMIT",bytes);
+                }
+            }
+            else System.out.println("esperando mais confirmações");
+
+        }, e);
+
+        messagingService.registerHandler("COMMIT", (addr,bytes)-> {
+            System.out.println("RECEBIDO COM TODO O GOSTO :D ");
+
+            Protos.Update update = update_serializer.decode(bytes);
+
+            String post_text = update.getText();
+            String post_topic = update.getCategory();
+            int topicIndex = update.getIndex();
+
+            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text);
+
+            this.postsDB.addPost(post_topic, post_text, topicIndex);
+
+
+        }, e);
+
+
 
         // When an UPDATE message is received
         messagingService.registerHandler("UPDATE", (addr,bytes)-> {
@@ -302,7 +360,9 @@ public class TwitterServer {
 
 
         messagingService.start();
-        Thread.sleep(10000);
+        Thread.sleep(5000);
+        startElection();
+
 
     }
 
@@ -318,7 +378,11 @@ public class TwitterServer {
 
     }
 
+
+
     public void startElection(){
+
+        System.out.println("Lez go");
 
         Serializer address_id_serializer = new SerializerBuilder().addType(Protos.AdressElection.class).addType(Address.class).build();
 
@@ -330,6 +394,13 @@ public class TwitterServer {
 
     }
 
+    public synchronized int getTwoPC(){
+        return this.twoPC++;
+    }
+
+    public synchronized void update2PC(int key){
+        this.confirms.replace(key,this.confirms.get(key)+1);
+    }
 
     public static void main(String[] args) throws Exception {
 

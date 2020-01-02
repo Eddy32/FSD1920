@@ -5,11 +5,13 @@ public class Update {
     private String text;
     private String category;
     private int index;
+    private int key;
 
     public Update(String text, String category, int index) {
         this.text = text;
         this.category = category;
         this.index = index;
+        this.key = 0;
     }
 
     public String getText() {
@@ -36,4 +38,11 @@ public class Update {
         this.index = index;
     }
 
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
+    }
 }

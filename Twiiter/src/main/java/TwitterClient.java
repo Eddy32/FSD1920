@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,9 +30,8 @@ public class TwitterClient {
     private Serializer list_serializer = new SerializerBuilder().addType(List.class).build();
 
     public TwitterClient(Address address, Address servidor) throws Exception {
-
         this.address = address;
-        this.e = Executors.newFixedThreadPool(1);
+        this.e = Executors.newFixedThreadPool(2);
         this.categories = new ArrayList<>();
 
         this.messagingService = new NettyMessagingService.Builder()
@@ -58,6 +59,17 @@ public class TwitterClient {
             }
         }, e);
 
+        // Handlers
+        messagingService.registerHandler("LIST", (addr, bytes) -> {
+            System.out.println("Recebi LIST");
+
+            // Decoding list info
+            Protos.List list = list_serializer.decode(bytes);
+            int i = 0;
+            for (String post : list.getPosts()) {
+                System.out.println(i++ + "-> " + post);
+            }
+        }, e);
 
         // Creating the message and serializing it
         byte[] data = s.encode("");
@@ -68,18 +80,7 @@ public class TwitterClient {
 
     public void startCliente() throws IOException {
 
-        // Handlers
-        messagingService.registerHandler("LIST", (addr, bytes) -> {
 
-
-            // Decoding list info
-            Protos.List list = list_serializer.decode(bytes);
-            int i = 0;
-            for (String post : list.getPosts()) {
-                System.out.println(i++ + "-> " + post);
-            }
-
-        }, e);
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String msg;
@@ -102,17 +103,16 @@ public class TwitterClient {
                         list_posts();
                         break;
                     default:
-                        System.out.printf("Opcao invalida");
+                        System.out.println("Opcao invalida");
                 }
                 //tipo_menu = resultado;
 
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Formato invalido");
+                ;
             }
 
-
         }
-
     }
 
     private void deal_subscriptions(BufferedReader in) {
@@ -168,33 +168,31 @@ public class TwitterClient {
         System.out.println(categories.toString());
     }
 
-    public void send_post(BufferedReader in) {
-        System.out.println("Escreva o post:");
-        try {
-            String mensagem = in.readLine();
-            System.out.println("Categorias");
-            ArrayList<String> arrayList = new ArrayList<String>();
-            Matcher m = Pattern.compile("#[a-zA-Z_0-9\\-]*")
-                    .matcher(mensagem);
-            while (m.find()) {
-                arrayList.add(m.group());
-            }
-            for (String cena : arrayList)
-                System.out.println(cena);
-            if (arrayList.size() < 1) {
-                System.out.println("Necessário pelo menos 1 categoria");
+    public void send_post(BufferedReader in ){
+            System.out.println("Escreva o post:");
+            try {
+                String mensagem = in.readLine();
+                System.out.println("Categorias");
+                ArrayList<String> arrayList = new ArrayList<String>();
+                Matcher m = Pattern.compile("#[-_'a-zA-ZÀ-ÖØ-öø-ÿ0-9]*")
+                        .matcher(mensagem);
+                while (m.find()) {
+                    arrayList.add(m.group());
+                }
+                for (String cena : arrayList)
+                    System.out.println(cena);
+                if( arrayList.size() < 1){
+                    System.out.println("Necessário pelo menos 1 categoria");
 
-            } else {
-                Post post = new Post(mensagem, arrayList);
-
-                byte[] data = post_serializer.encode(post);
-                System.out.println(servidor.toString());
-                messagingService.sendAsync(servidor, "POST", data);
+                }else{
+                    Post post = new Post(mensagem, arrayList);
+                    byte[] data = post_serializer.encode(post);
+                    System.out.println(servidor.toString());
+                    messagingService.sendAsync(servidor, "POST", data);
             }
 
         } catch (IOException e) {
             System.out.println("Formato invalido");
-            ;
         }
 
     }
@@ -206,8 +204,9 @@ public class TwitterClient {
             Get get = new Get(categories);
 
             byte[] data = get_serializer.encode(get);
-
+            System.out.println("Esperar pela resposta do servidor");
             messagingService.sendAsync(servidor, "GET", data);
+
         }
     }
 

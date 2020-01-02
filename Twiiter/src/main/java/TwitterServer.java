@@ -221,7 +221,7 @@ public class TwitterServer {
 
         // When a GET message is received
         messagingService.registerHandler("GET", (addr,bytes)-> {
-
+            System.out.println("Received Get");
             // Decoding data received
             Protos.Get get = get_serializer.decode(bytes);
 
@@ -295,7 +295,7 @@ public class TwitterServer {
             Protos.List list = new Protos.List(mostRecent.stream().map(Post::getPost).collect(Collectors.toList()));
 
             byte[] data = list_serializer.encode(list);
-
+            System.out.println("Send list to " + addr.toString());
             messagingService.sendAsync(addr, "LIST", data);
 
         }, e);

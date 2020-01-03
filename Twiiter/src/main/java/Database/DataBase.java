@@ -3,17 +3,18 @@ package Database;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataBase {
-    private HashMap<String, ListPosts> posts;
+    private ConcurrentHashMap<String, ListPosts> posts;
     private final Lock l = new ReentrantLock();
     private int logicCounter;
 
 
     public DataBase(){
-        this.posts = new HashMap<>();
+        this.posts = new ConcurrentHashMap<>();
         this.logicCounter = 0;
     }
 
@@ -29,13 +30,27 @@ public class DataBase {
             this.posts.put(topic,new_post);
         }
         l.unlock();
-        new_post.addPost(post,this.logicCounter++,index);
+        new_post.addPost(post,this.logicCounter,index);
 
     }
 
+
     public synchronized int getIndex(String topic){
-        if(this.posts.containsKey(topic)) return this.posts.get(topic).getIndex();
+        if(this.posts.containsKey(topic)) {
+            logicCounter++;
+            return this.posts.get(topic).getIndex();
+        }
         else return 0;
+    }
+
+    public synchronized Pair<Integer, Integer> getIndexGlobalCounter(String topic){
+        if(this.posts.containsKey(topic)){
+            return new Pair<>(this.posts.get(topic).getIndex(),++logicCounter);
+        }
+        else{
+            this.posts.put(topic,new ListPosts());
+            return new Pair<>(0,++logicCounter);
+        }
     }
 
     public int getIndexOfLastUpdate(String topic) {

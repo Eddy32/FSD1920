@@ -1,21 +1,18 @@
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.HashMap;
 
-public class VectorClock {
+public class VectorClock<T> {
 
-    private int[] clock;
+    private HashMap<T, Clock> clock = new HashMap<>();
 
-    public VectorClock (int vcSize) { this.clock = new int[vcSize]; }
+    public synchronized int increment (T key) {
 
-    public synchronized int increment (int index) { return ++clock[index]; }
+        if (!this.clock.containsKey(key)) this.clock.put(key, new Clock());
 
-    public int getClock (int index) { return clock[index];}
+        return this.clock.get(key).increment();
 
-    public int[] getVectorClock() { return clock; }
+    }
 
-    public void print () { System.out.println(this.toString()); }
-
-    @Override
-    public String toString () { return Arrays.toString(clock); }
+    public int getClock (T key) { return this.clock.getOrDefault(key, new Clock()).get();}
 
 }

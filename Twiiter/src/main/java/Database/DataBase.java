@@ -38,6 +38,11 @@ public class DataBase {
         else return 0;
     }
 
+    public int getIndexOfLastUpdate(String topic) {
+        if (this.posts.containsKey(topic)) return this.posts.get(topic).getIndexNoIncrement();
+        else return -1;
+    }
+
     public ArrayList<Post> getPostsTopic(String topic){
         ArrayList<Post> order = new ArrayList<>();
         if(this.posts.containsKey(topic)){

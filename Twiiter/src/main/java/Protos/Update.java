@@ -6,17 +6,23 @@ public class Update {
     private String category;
     private int index;
     private int key;
+    private String username;
+    private int userClock;
 
-    public Update(String text, String category, int index) {
+    public Update(String text, String category, int index, String username, int userClock) {
         this.text = text;
         this.category = category;
         this.index = index;
         this.key = 0;
+        this.username = username;
+        this.userClock = userClock;
     }
 
-    public String getText() {
-        return text;
-    }
+    public int getUserClock() {return userClock;}
+
+    public String getUsername() { return username; }
+
+    public String getText() { return text; }
 
     public String getCategory() {
         return category;

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 public class Post {
 
-    private String            text;
+    private String text;
     private ArrayList<String> categories;
     private int id;
+    private String owner;
+    private int ownerClock;
 
     public String getText() {
         return text;
@@ -32,9 +34,12 @@ public class Post {
         this.id = id;
     }
 
-    public Post(String text, ArrayList<String> categories, int id) {
+    public String getOwner() { return owner; }
+
+    public Post(String text, ArrayList<String> categories, String owner, int id) {
         this.text = text;
         this.categories = categories;
         this.id = id;
+        this.owner = owner;
     }
 }

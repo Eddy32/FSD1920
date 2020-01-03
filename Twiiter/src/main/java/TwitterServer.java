@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import Database.DataBase;
-import org.apache.commons.math3.analysis.function.Add;
 
 public class TwitterServer {
 
@@ -28,7 +27,11 @@ public class TwitterServer {
     private VectorClock vectorClock; // Global clock (used only by leader)
     private ArrayList<TreeMap<Integer, Protos.TryUpdate>> serverQueue; // Array of the post queue for each server (used only by leader)
     private DataBase postsDB; // Post database
+
     private TestJournal log;
+
+    private HashMap<String,TreeMap<Integer, Protos.Update>> postQueue;
+    private VectorClock clientClocks;
 
 
     public TwitterServer(int id, List<Address> addresses) throws Exception {
@@ -39,13 +42,16 @@ public class TwitterServer {
         this.addresses = addresses;
         this.confirms = new HashMap<Integer, Integer>();
 
-        this.vectorClock = new VectorClock(addresses.size());
+        this.vectorClock = new VectorClock();
         this.clock = new Clock();
         this.postsDB = new DataBase();
         this.log = new TestJournal("log" + id);
 
         this.serverQueue = new ArrayList<>();
         for (int i=0; i<addresses.size(); i++) serverQueue.add(new TreeMap<>());
+
+        this.postQueue = new HashMap<>();
+        this.clientClocks = new VectorClock();
 
         ExecutorService e = Executors.newFixedThreadPool(12);
 
@@ -119,6 +125,9 @@ public class TwitterServer {
             String post_text = post.getText();
             ArrayList<String> post_topics = post.getCategories();
 
+            String post_owner = post.getOwner();
+            int post_ownwer_clock = post.getId();
+
             // PRINTING
 
             StringBuffer post_print = new StringBuffer();
@@ -132,9 +141,9 @@ public class TwitterServer {
             for (String topic: post_topics) {
 
                 int post_clock = clock.increment();
-                System.out.println("SENDING TRY UPDATE TO " + addresses.get(leader).port() + ": (" + topic + ") -> " + post_text + " || Clock = " + post_clock);
+                System.out.println("SENDING TRY UPDATE TO " + addresses.get(leader).port() + ": (" + topic + ") -> " + post_text + " || Clock = " + post_clock + " || User = " + post_owner + " UserClock = " + post_ownwer_clock);
 
-                Protos.TryUpdate try_update = new Protos.TryUpdate(post_text, topic, id, post_clock);
+                Protos.TryUpdate try_update = new Protos.TryUpdate(post_text, topic, id, post_clock, post_owner, post_ownwer_clock);
 
                 byte[] data = try_update_serializer.encode(try_update);
                 this.log.writeLog("SENDING",post_clock);
@@ -154,16 +163,22 @@ public class TwitterServer {
             String post_topic = try_update.getCategory();
             int serverId = try_update.getServerId();
             int serverClock = try_update.getServerClock();
-            int vectorClockact = vectorClock.getClock(serverId);
+
+            String post_owner = try_update.getUser();
+            int post_owner_clock = try_update.getUserClock();
+
+
+            int vectorClockAct = vectorClock.getClock(serverId);
+
             if (serverClock == vectorClock.getClock(serverId) + 1) {
 
                 // Getting index for post topic
                 Integer index = this.postsDB.getIndex(post_topic);
 
-                System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
+                System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index + " || User = " + post_owner + " UserClock = " + post_owner_clock);
 
                 // Sending broadcast of current post
-                Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
+                Protos.Update broadcast = new Protos.Update(post_text, post_topic, index, post_owner, post_owner_clock);
                 byte[] data = update_serializer.encode(broadcast);
                 messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
 
@@ -175,10 +190,15 @@ public class TwitterServer {
                     post_text = try_update.getText();
                     post_topic = try_update.getCategory();
                     index = this.postsDB.getIndex(post_topic);
+                    post_owner = try_update.getUser();
+                    post_owner_clock = try_update.getUserClock();
+
+
+                    System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index + " || User = " + post_owner + " UserClock = " + post_owner_clock);
 
                     System.out.println("MANDAR DA QUEUE SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
-                    broadcast = new Protos.Update(post_text, post_topic, index);
+                    broadcast = new Protos.Update(post_text, post_topic, index, post_owner, post_owner_clock);
                     data = update_serializer.encode(broadcast);
                     messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
                     vectorClock.increment(serverId);
@@ -188,7 +208,9 @@ public class TwitterServer {
             } else {
 
                 // PRINTING
-                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClockact + ")");
+
+                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClockAct + ")" + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+
 
                 // Adding to queue
                 serverQueue.get(serverId).put(serverClock, try_update);
@@ -205,10 +227,12 @@ public class TwitterServer {
                         post_text = try_update.getText();
                         post_topic = try_update.getCategory();
                         int index = this.postsDB.getIndex(post_topic);
+                        post_owner = try_update.getUser();
+                        post_owner_clock = try_update.getUserClock();
 
-                        System.out.println("SENDING2 TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
+                        System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index + " || User = " + post_owner + " UserClock = " + post_owner_clock);
 
-                        Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
+                        Protos.Update broadcast = new Protos.Update(post_text, post_topic, index, post_owner, post_owner_clock);
                         byte[] data = update_serializer.encode(broadcast);
                         messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
                         vectorClock.increment(serverId);
@@ -279,28 +303,19 @@ public class TwitterServer {
             String post_topic = update.getCategory();
             int topicIndex = update.getIndex();
 
-            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex);
+            String post_owner = update.getUsername();
+            int post_owner_clock = update.getUserClock();
+
+            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+
+            // IF USER CLOCK IS MATCHING
 
             this.postsDB.addPost(post_topic, post_text, topicIndex);
 
+            //if (this.clientClocks.getClock())
 
-        }, e);
+            //if (this.postQueue.)
 
-
-
-        // When an UPDATE message is received
-        messagingService.registerHandler("UPDATE", (addr,bytes)-> {
-
-            // Decoding data received
-            Protos.Update update = update_serializer.decode(bytes);
-
-            String post_text = update.getText();
-            String post_topic = update.getCategory();
-            int topicIndex = update.getIndex();
-
-            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex);
-
-            this.postsDB.addPost(post_topic, post_text, topicIndex);
 
         }, e);
 

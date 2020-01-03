@@ -13,8 +13,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,14 +28,17 @@ public class TwitterClient {
     private Serializer list_serializer = new SerializerBuilder().addType(List.class).build();
     private Clock counter;
     private String username;
+    private Log log;
 
     public TwitterClient(Address address, Address servidor) throws Exception {
 
         this.address = address;
-        this.e = Executors.newFixedThreadPool(2);
+        this.e = Executors.newFixedThreadPool(5);
         this.categories = new ArrayList<>();
         this.counter = new Clock();
         this.username = "Anonymous";
+        this.log = new Log("log" + this.username);
+
 
         this.messagingService = new NettyMessagingService.Builder()
                 .withName("Twitter_Client_" + address.toString())
@@ -47,6 +48,18 @@ public class TwitterClient {
 
         // Creating serializer for encoding and decoding to/from bytes
         Serializer s = new SerializerBuilder().addType(Address.class).build();
+
+
+        messagingService.registerHandler("ACK", (addr,bytes)-> {
+
+            Protos.Post post = post_serializer.decode(bytes);
+            this.log.readLog(post.getId());
+            this.log.readLog(post.getId());
+            this.log.confirmAction(post.getId());
+            System.out.println("----");
+            this.log.readLog(post.getId());
+
+        }, e);
 
         // Register Handler for when a message is received
         messagingService.registerHandler("ADDRESS", (addr, bytes) -> {
@@ -207,9 +220,12 @@ public class TwitterClient {
                     System.out.println("Necessário pelo menos 1 categoria");
 
                 }else{
-                    Post post = new Post(mensagem, arrayList, username, counter.increment());
+                    int id = counter.increment();
+                    Post post = new Post(mensagem, arrayList, username, id );
                     byte[] data = post_serializer.encode(post);
                     System.out.println(servidor.toString());
+                    System.out.println("->" + post.toString());
+                    this.log.writeLog("POST " + post.toString() + " " + servidor.port(),id);
                     messagingService.sendAsync(servidor, "POST", data);
             }
 

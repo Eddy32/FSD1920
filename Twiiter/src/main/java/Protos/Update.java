@@ -51,4 +51,16 @@ public class Update {
     public void setKey(int key) {
         this.key = key;
     }
+
+    public String toString(){
+        return (this.text + '.' + this.category + '.' + this.index + '.' + this.key + '.' + this.username + '.' + this.userClock);
+    }
+
+    public static Update buildUpdate(String update){
+        String[] args;
+        args = update.split("\\.+");
+        Update done = new Update(args[0],args[1],Integer.parseInt(args[2]),args[4],Integer.parseInt(args[5]));
+        done.setKey(Integer.parseInt(args[3]));
+        return done;
+    }
 }

@@ -36,6 +36,33 @@ public class Post {
 
     public String getOwner() { return owner; }
 
+    public String toString(){
+        String fin = this.text + '.' + this.id + '.' + this.owner + '.' +this.ownerClock +'.';
+        for(String s: categories){
+            fin = fin + s;
+            fin = fin + '-';
+        }
+        return fin;
+    }
+
+    public void setOwnerClock(int ownerClock) {
+        this.ownerClock = ownerClock;
+    }
+
+    public static Post buildUpdate(String post){
+        String[] args,categorias;
+        args = post.split("\\.+");
+        ArrayList<String> cats = new ArrayList<String>();
+        categorias = args[4].split("\\-+");
+
+        for(String s: categorias){
+            cats.add(s);
+        }
+        Post p = new Post(args[0],cats,args[2],Integer.parseInt(args[1]));
+        p.setOwnerClock(Integer.parseInt(args[3]));
+        return p;
+    }
+
     public Post(String text, ArrayList<String> categories, String owner, int id) {
         this.text = text;
         this.categories = categories;

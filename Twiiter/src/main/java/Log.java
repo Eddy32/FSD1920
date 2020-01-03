@@ -7,9 +7,8 @@ import io.atomix.utils.serializer.Serializer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
 
-public class TestJournal {
+public class Log {
     private String logName;
     private Serializer s;
     private SegmentedJournal<String> sj;
@@ -18,7 +17,7 @@ public class TestJournal {
     private HashMap<Integer,ArrayList<Long>> lines;
 
 
-    public TestJournal(String logName){
+    public Log(String logName){
         this.logName = logName;
         this.s = Serializer.builder()
                 .build();
@@ -29,6 +28,19 @@ public class TestJournal {
         this.r = sj.openReader(0);
         this.w = sj.writer();
         this.lines = new HashMap<Integer,ArrayList<Long>>();
+    }
+
+    public ArrayList<String> getInstructions(){
+        ArrayList<String> inst = new ArrayList<String>();
+        for(ArrayList<Long> arrayL: this.lines.values()){
+            for(Long l: arrayL){
+                this.r = sj.openReader(l);
+                Indexed<String> e = r.next();
+                inst.add(e.entry());
+            }
+        }
+
+        return inst;
     }
 
 
@@ -44,7 +56,7 @@ public class TestJournal {
             this.r = sj.openReader(i);
             Indexed<String> e = r.next();
             log.add(e.entry());
-            System.out.println(e.index()+": "+e.entry() + ".");
+            System.out.println("ENTRY NO LOG:"+e.entry());
         }
 
         this.r.close();
@@ -67,18 +79,18 @@ public class TestJournal {
 
     }
 
-    public void writeLog(ArrayList<String> info, int key){
+    public void writeLog(String info, int key){
 
         if(!this.lines.containsKey(key)){
              ArrayList<Long> line = new ArrayList<Long>();
              this.lines.put(key,line);
         }
 
-        for(String data: info){
-            this.lines.get(key).add(w.getNextIndex());
-            this.w.append(key + " " + data);
 
-        }
+            this.lines.get(key).add(w.getNextIndex());
+            this.w.append(key + " " + info);
+
+
 
     }
 
@@ -110,23 +122,10 @@ public class TestJournal {
     }
 
     public void resetconfirmAction(int key){
-
         this.lines.get(key).remove(0);
-
     }
 
-    /*   public ArrayList<String> getInstructions(){
-        ArrayList<String> inst = new ArrayList<String>();
 
-        for(Long i: this.lines.get(key) ){
-            this.r = sj.openReader(i);
-            Indexed<String> e = r.next();
-            log.add(e.entry());
-            System.out.println(e.index()+": "+e.entry() + ".");
-        }
-
-
-    }*/
 
     public void confirmAction(int key){
 
@@ -135,33 +134,40 @@ public class TestJournal {
 
     }
 
+
+
     public static void main(String[] args) throws Exception {
 
-        TestJournal tj = new TestJournal("teste");
+        Log tj = new Log("teste");
 
         ArrayList<String> data = new ArrayList<String>();
-        data.add("Hola");
-        data.add("soy");
-        data.add("Eddy");
+        tj.writeLog("Hola",1);
+        tj.writeLog("soy",2);
+        tj.writeLog("Eddy",1);
 
         ArrayList<String> data2 = new ArrayList<String>();
-        data2.add("test");
-        data2.add("kapa");
-        data2.add("son");
+        tj.writeLog("test",2);
+        tj.writeLog("kapa",2);
+        tj.writeLog("son",1);
 
         //tj.writeLog(data,1);
         //tj.writeLog(data2,2);
-        tj.resetJournal();
+        //tj.resetJournal();
         System.out.println("VOu ler:");
         tj.readLog(1);
         tj.readLog(2);
         System.out.println("------------");
-        //tj.confirmAction(1);
-        //tj.confirmAction(2);
-        //tj.confirmAction(1);
-        System.out.println("------------");
+        tj.confirmAction(1);
+        tj.confirmAction(2);
+        tj.confirmAction(1);
 
-       // tj.readLog(1);
+        tj.readLog(1);
+        tj.readLog(2);
+
+        System.out.println("------------");
+        ArrayList<String> teste = tj.getInstructions();
+        for(String s : teste)
+            System.out.println("-> " + s);
 
         Serializer s = Serializer.builder()
                 .build();

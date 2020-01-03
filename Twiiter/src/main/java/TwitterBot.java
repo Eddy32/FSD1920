@@ -28,11 +28,13 @@ public class TwitterBot implements Runnable {
     private Serializer post_serializer = new SerializerBuilder().addType(Post.class).build();
     private Serializer get_serializer = new SerializerBuilder().addType(Get.class).build();
     private Serializer list_serializer = new SerializerBuilder().addType(List.class).build();
-
     private int id;
     private int no_posts;
     private int no_topics;
     private Clock clock;
+    private String username;
+    private Log log;
+
 
     public TwitterBot(Address address, Address servidor, int id, int no_posts, int no_topics) {
 
@@ -44,6 +46,8 @@ public class TwitterBot implements Runnable {
         this.no_topics = no_topics;
         this.clock = new Clock();
 
+        this.username = "bot-" + id;
+        this.log = new Log("log-" + this.username);
         this.messagingService = new NettyMessagingService.Builder()
                 .withName("Twitter_Bot_" + address.toString())
                 .withReturnAddress(address).build();
@@ -67,6 +71,15 @@ public class TwitterBot implements Runnable {
 
         }, e);
 
+        Serializer ackSerializer = new SerializerBuilder().build();
+
+        messagingService.registerHandler("ACK", (addr,bytes)-> {
+
+            int post = ackSerializer.decode(bytes);
+            this.log.confirmAction(post);
+            this.log.readLog(post);
+
+        }, e);
         // Handlers
         messagingService.registerHandler("LIST", (addr, bytes) -> {
             System.out.println("Recebi LIST");
@@ -94,15 +107,16 @@ public class TwitterBot implements Runnable {
             StringBuffer text = new StringBuffer("B" + id + "P" + i);
             ArrayList<String> topics = new ArrayList<>();
             Random r = new Random();
-            for (int j=0; j<no_topics; j++) topics.add("#1" );
+            for (int j=0; j<no_topics; j++)
+                topics.add("#" + j );
 
             //for (int j=0; j<no_topics; j++) topics.add(" #" + j);
-
-            Post post = new Post(text.toString(), topics, "Bot_" + id, clock.increment());
+            int id2 = clock.increment();
+            Post post = new Post(text.toString(), topics, "Bot_" + id, id2);
             byte[] data = post_serializer.encode(post);
 
             System.out.println(servidor.toString());
-
+            this.log.writeLog("POST " + post.toString() + " " + servidor.port(),id2);
             messagingService.sendAsync(servidor, "POST", data);
 
         }

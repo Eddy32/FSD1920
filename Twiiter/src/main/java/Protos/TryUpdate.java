@@ -53,4 +53,15 @@ public class TryUpdate {
     public void setServerClock(int serverClock) {
         this.serverClock = serverClock;
     }
+
+    public String toString(){
+        return (this.text + '.' + this.category + '.' + this.serverId + '.' + this.serverClock + '.' + this.user + '.' + this.userClock);
+    }
+
+    public static TryUpdate buildUpdate(String tryupdate){
+        String[] args;
+        args = tryupdate.split("\\.+");
+        TryUpdate done = new TryUpdate(args[0],args[1],Integer.parseInt(args[2]),Integer.parseInt(args[3]),args[4],Integer.parseInt(args[5]));
+        return done;
+    }
 }

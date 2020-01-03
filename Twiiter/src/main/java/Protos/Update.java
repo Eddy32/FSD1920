@@ -45,4 +45,14 @@ public class Update {
         this.index = index;
         this.global_clock = global_clock;
     }
+
+    public String toString(){
+        return (this.text + '.' + this.category + '.' + this.index + '.' + this.global_clock);
+    }
+
+    public static Update buildUpdate(String update){
+        String[] args;
+        args = update.split("\\.+");
+        return new Update(args[0],args[1],Integer.parseInt(args[2]),Integer.parseInt(args[4]));
+    }
 }

@@ -29,6 +29,7 @@ public class TwitterServer {
     private VectorClock vectorClock; // Global clock (used only by leader)
     private ArrayList<ConcurrentHashMap<Integer, Protos.TryUpdate>> serverQueue; // Array of the post queue for each server (used only by leader)
     private DataBase postsDB; // Post database
+    private Log log;
     private ConcurrentHashMap<String,ConcurrentHashMap<Integer, Protos.Post>> postQueue;
     private ConcurrentHashMap<Integer, Update> updateQueue;
     private VectorClock clientClocks;
@@ -42,7 +43,7 @@ public class TwitterServer {
         this.leader = 0;
         this.addresses = addresses;
         this.confirms = new HashMap<Integer, Integer>();
-
+        this.log = new Log("log" + id);
         this.vectorClock = new VectorClock();
         this.clock = new Clock();
         this.teste = new Clock();
@@ -70,6 +71,7 @@ public class TwitterServer {
         Serializer get_serializer = new SerializerBuilder().addType(Protos.Get.class).build();
         Serializer list_serializer = new SerializerBuilder().addType(Protos.List.class).build();
         Serializer election_serializer = new SerializerBuilder().addType(Address.class).build();
+        Serializer ack_serializer = new SerializerBuilder().build();
 
         Serializer address_id_serializer = new SerializerBuilder().addType(Protos.AdressElection.class).addType(Address.class).build();
 
@@ -97,7 +99,13 @@ public class TwitterServer {
 
             }
         }, e);
+        // Handler ACK
+        messagingService.registerHandler("ACK", (addr,bytes)-> {
 
+            Integer key = ack_serializer.decode(bytes);
+            this.log.confirmAction(key);
+
+        },e);
         //Tell the Server he is the new leader
         messagingService.registerHandler("SHARE2LEADER", (addr,bytes)-> {
             this.leader = this.id;
@@ -163,9 +171,13 @@ public class TwitterServer {
 
                     byte[] data = try_update_serializer.encode(try_update);
 
+                    this.log.writeLog("TRY_UPDATE " + try_update.toString() + " " +  addresses.get(leader).port(),post_clock);
                     messagingService.sendAsync(addresses.get(leader), "TRY_UPDATE", data);
 
+
+
                 }
+                messagingService.sendAsync(addr,"ACK",ack_serializer.encode(post_owner_clock));
 
                 this.clientClocks.increment(post_owner);
 
@@ -190,9 +202,11 @@ public class TwitterServer {
 
                         byte[] data = try_update_serializer.encode(try_update);
 
+                        this.log.writeLog("TRY_UPDATE " + try_update.toString() + " " +  addresses.get(leader).port(),post_clock);
                         messagingService.sendAsync(addresses.get(leader), "TRY_UPDATE", data);
 
                     }
+                    messagingService.sendAsync(addr,"ACK",ack_serializer.encode(post_owner_clock));
 
                     this.clientClocks.increment(post_owner);
 
@@ -231,9 +245,11 @@ public class TwitterServer {
 
                             byte[] data = try_update_serializer.encode(try_update);
 
+                            this.log.writeLog("TRY_UPDATE " + try_update.toString() + " " +  addresses.get(leader).port(),post_clock);
                             messagingService.sendAsync(addresses.get(leader), "TRY_UPDATE", data);
 
                         }
+                        messagingService.sendAsync(addr,"ACK",ack_serializer.encode(post_owner_clock));
 
                         this.clientClocks.increment(post_owner);
 
@@ -259,6 +275,7 @@ public class TwitterServer {
             String post_owner = try_update.getUser();
             int post_owner_clock = try_update.getUserClock();
 
+            //Guarda em log o post recebido
 
             int vectorClockAct = vectorClock.getClock(serverId);
 
@@ -272,6 +289,12 @@ public class TwitterServer {
                 // Sending broadcast of current post
                 Protos.Update broadcast = new Protos.Update(post_text, post_topic, index.getLeft(), index.getRight());
                 byte[] data = update_serializer.encode(broadcast);
+
+                this.log.writeLog("BROADCAST " + try_update.toString() + " " + addresses.get(serverId).port(),try_update.getServerClock());
+                byte [] dataKey = ack_serializer.encode(try_update.getServerClock());
+                //envia o ack do pacote que acabou de receber
+                messagingService.sendAsync(addr,"ACK", dataKey);
+
                 messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
 
                 vectorClock.increment(serverId);
@@ -288,6 +311,10 @@ public class TwitterServer {
                     broadcast = new Protos.Update(post_text, post_topic, index.getLeft(), index.getRight());
                     data = update_serializer.encode(broadcast);
                     messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
+                    this.log.writeLog("BROADCAST " + try_update.toString() + " " + addresses.get(serverId).port(),try_update.getServerClock());
+                    dataKey = ack_serializer.encode(try_update.getServerClock());
+                    //envia o ack do pacote que acabou de receber
+                    messagingService.sendAsync(addr,"ACK", dataKey);
                     vectorClock.increment(serverId);
 
                 }
@@ -319,6 +346,12 @@ public class TwitterServer {
 
                         Protos.Update broadcast = new Protos.Update(post_text, post_topic, index.getLeft(), index.getRight());
                         byte[] data = update_serializer.encode(broadcast);
+
+                        this.log.writeLog("BROADCAST " + try_update.toString() + " " + addresses.get(serverId).port(),try_update.getServerClock());
+                        byte [] dataKey = ack_serializer.encode(try_update.getServerClock());
+                        //envia o ack do pacote que acabou de receber
+                        messagingService.sendAsync(addr,"ACK", dataKey);
+
                         messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
                         vectorClock.increment(serverId);
 
@@ -333,6 +366,10 @@ public class TwitterServer {
         // When a BROADCAST message is received
         messagingService.registerHandler("BROADCAST", (addr,bytes)-> {
 
+            Update update = update_serializer.decode(bytes);
+
+            this.log.writeLog("2FC " + try_update.toString() + " " + addresses.get(serverId).port(),try_update.getServerClock());
+            messagingService.sendAsync(addr,"ACK", dataKey);
 
             System.out.println("Recebi broadcast");
             Protos.Update post = update_serializer.decode(bytes);

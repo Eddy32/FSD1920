@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -31,7 +32,6 @@ public class TwitterBot implements Runnable {
     private int id;
     private int no_posts;
     private int no_topics;
-
     private Clock clock;
 
     public TwitterBot(Address address, Address servidor, int id, int no_posts, int no_topics) {
@@ -93,6 +93,8 @@ public class TwitterBot implements Runnable {
 
             StringBuffer text = new StringBuffer("B" + id + "P" + i);
             ArrayList<String> topics = new ArrayList<>();
+            Random r = new Random();
+            for (int j=0; j<no_topics; j++) topics.add("#1" );
 
             for (int j=0; j<no_topics; j++) topics.add(" #" + j);
 
@@ -100,6 +102,7 @@ public class TwitterBot implements Runnable {
             byte[] data = post_serializer.encode(post);
 
             System.out.println(servidor.toString());
+
             messagingService.sendAsync(servidor, "POST", data);
 
         }
@@ -107,19 +110,23 @@ public class TwitterBot implements Runnable {
     }
 
     public static void main(String[] args) throws Exception { // args[0] Porta Cliente args[1] porta loadbalancer args[2] Bot ID args[3] No posts / bot args[4] No topics / post
+        try{
+            // Getting own port from comm   and line
+            int port = Integer.parseInt(args[0]);
 
-        // Getting own port from command line
-        int port = Integer.parseInt(args[0]);
+            // Getting load balancer port from command line
+            int load_balancer = Integer.parseInt(args[1]);
 
-        // Getting load balancer port from command line
-        int load_balancer = Integer.parseInt(args[1]);
+            // Getting spammer settings
+            int no_bots = Integer.parseInt(args[2]);
+            int no_posts_per_bot = Integer.parseInt(args[3]);
+            int no_topics_per_post = Integer.parseInt(args[4]);
 
-        // Getting spammer settings
-        int no_bots = Integer.parseInt(args[2]);
-        int no_posts_per_bot = Integer.parseInt(args[3]);
-        int no_topics_per_post = Integer.parseInt(args[4]);
+            for (int i=0; i<no_bots; i++) new TwitterBot(Address.from(port + i), Address.from(load_balancer), i, no_posts_per_bot, no_topics_per_post);
 
-        for (int i=0; i<no_bots; i++) new TwitterBot(Address.from(port + i), Address.from(load_balancer), i, no_posts_per_bot, no_topics_per_post);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 }

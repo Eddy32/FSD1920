@@ -2,17 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d5cc674-2b21-4593-963b-8eda5421f088" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/TestJournal.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Clock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Clock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Database/DataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/DataBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Database/ListPosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/ListPosts.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/Post.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/TryUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/TryUpdate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/Update.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/Update.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/TwitterBot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterBot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterLoadBalancer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterLoadBalancer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/TwitterServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/VectorClock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VectorClock.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

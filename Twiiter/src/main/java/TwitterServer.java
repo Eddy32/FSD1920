@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import Database.DataBase;
-import org.apache.commons.math3.analysis.function.Add;
 
 public class TwitterServer {
 
@@ -112,6 +111,7 @@ public class TwitterServer {
 
         }, e);
 
+        
         // When a POST message is received
         messagingService.registerHandler("POST", (addr,bytes)-> {
 
@@ -159,8 +159,12 @@ public class TwitterServer {
             String post_topic = try_update.getCategory();
             int serverId = try_update.getServerId();
             int serverClock = try_update.getServerClock();
+
             String post_owner = try_update.getUser();
             int post_owner_clock = try_update.getUserClock();
+
+
+            int vectorClockAct = vectorClock.getClock(serverId);
 
             if (serverClock == vectorClock.getClock(serverId) + 1) {
 
@@ -175,10 +179,8 @@ public class TwitterServer {
                 messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
 
                 vectorClock.increment(serverId);
-
                 // Sending the following posts in the queue for broadcast
-                for (int i = serverClock + 1; serverQueue.get(serverId).containsKey(i); i++) {
-
+                for (int i = vectorClock.getClock(serverId) + 1; serverQueue.get(serverId).containsKey(i); i++) {
                     try_update = serverQueue.get(serverId).remove(i);
 
                     post_text = try_update.getText();
@@ -187,7 +189,10 @@ public class TwitterServer {
                     post_owner = try_update.getUser();
                     post_owner_clock = try_update.getUserClock();
 
+
                     System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+
+                    System.out.println("MANDAR DA QUEUE SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
                     broadcast = new Protos.Update(post_text, post_topic, index, post_owner, post_owner_clock);
                     data = update_serializer.encode(broadcast);
@@ -199,17 +204,20 @@ public class TwitterServer {
             } else {
 
                 // PRINTING
-                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")" + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+
+                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClockAct + ")" + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+
 
                 // Adding to queue
                 serverQueue.get(serverId).put(serverClock, try_update);
 
                 // Re-checking if the value added to the queue is the next to be broadcasted
-                if (serverClock == vectorClock.getClock(serverId) + 1) {
+                if (serverClock == vectorClock.getClock(serverId) + 1) { // serverClock 5; Vector = 4 (+1=5)
+                    System.out.println("Welele ");
 
                     // Removing everything from the queue becasuse it's my turn
-                    for (int i = serverClock + 1; serverQueue.get(serverId).containsKey(i); i++) {
-
+                    for (int i = serverClock ; serverQueue.get(serverId).containsKey(i); i++) { // i a começar a 6
+                                                                                                   //G Fucking
                         try_update = serverQueue.get(serverId).remove(i);
 
                         post_text = try_update.getText();
@@ -235,6 +243,8 @@ public class TwitterServer {
 
         // When a BROADCAST message is received
         messagingService.registerHandler("BROADCAST", (addr,bytes)-> {
+
+
 
             int key = getTwoPC(); //id para identificar os ACK para o post
             this.confirms.put(key,0); //inicializar a 0

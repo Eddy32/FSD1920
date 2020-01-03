@@ -38,7 +38,7 @@ public class TwitterLoadBalancer {
         // Register Handler for when a message is received
         messagingService.registerHandler("GET_ADDR", (addr, bytes) -> {
 
-            int index = r.nextInt(this.addresses.size());
+            int index = r.nextInt(this.addresses.size() -1);
 
             // Serializing the Address
             byte[] data = s.encode(this.addresses.get(index));

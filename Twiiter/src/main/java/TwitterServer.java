@@ -300,6 +300,8 @@ public class TwitterServer {
             String post_owner = update.getUsername();
             int post_owner_clock = update.getUserClock();
 
+            if (!postQueue.containsKey(post_owner)) postQueue.put(post_owner, new TreeMap<>());
+
             // IF USER CLOCK IS MATCHING
             if (post_owner_clock == clientClocks.getClock(post_owner) + 1) {
 
@@ -310,7 +312,7 @@ public class TwitterServer {
                 this.clientClocks.increment(post_owner);
 
                 // Checking rest of the queue
-                for (int i=post_owner_clock + 1; this.postQueue.getOrDefault(post_owner, new TreeMap<>()).containsKey(i); i++) {
+                for (int i=clientClocks.getClock(post_owner) + 1; this.postQueue.get(post_owner).containsKey(i); i++) {
 
                     update = this.postQueue.get(post_owner).get(i);
 
@@ -334,7 +336,7 @@ public class TwitterServer {
 
                 if (post_owner_clock == clientClocks.getClock(post_owner) + 1) {
 
-                    for (int i=post_owner_clock; this.postQueue.getOrDefault(post_owner, new TreeMap<>()).containsKey(i); i++) {
+                    for (int i=clientClocks.getClock(post_owner); this.postQueue.get(post_owner).containsKey(i); i++) {
 
                         update = this.postQueue.get(post_owner).get(i);
 

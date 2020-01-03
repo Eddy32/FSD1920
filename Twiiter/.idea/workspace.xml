@@ -67,7 +67,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.11 - TwitterBot (8000)">
+  <component name="RunManager" selected="Application.6- TwitterClient (9000)">
     <configuration name="0- TwitterServer (10001)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
       <module name="Twitter" />

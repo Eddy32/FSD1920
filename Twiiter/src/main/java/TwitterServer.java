@@ -151,7 +151,7 @@ public class TwitterServer {
             String post_topic = try_update.getCategory();
             int serverId = try_update.getServerId();
             int serverClock = try_update.getServerClock();
-
+            int vectorClockact = vectorClock.getClock(serverId);
             if (serverClock == vectorClock.getClock(serverId) + 1) {
 
                 // Getting index for post topic
@@ -165,17 +165,15 @@ public class TwitterServer {
                 messagingService.sendAsync(addresses.get(serverId), "BROADCAST", data);
 
                 vectorClock.increment(serverId);
-
                 // Sending the following posts in the queue for broadcast
-                for (int i = serverClock + 1; serverQueue.get(serverId).containsKey(i); i++) {
-
+                for (int i = vectorClock.getClock(serverId) + 1; serverQueue.get(serverId).containsKey(i); i++) {
                     try_update = serverQueue.get(serverId).remove(i);
 
                     post_text = try_update.getText();
                     post_topic = try_update.getCategory();
                     index = this.postsDB.getIndex(post_topic);
 
-                    System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
+                    System.out.println("MANDAR DA QUEUE SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
                     broadcast = new Protos.Update(post_text, post_topic, index);
                     data = update_serializer.encode(broadcast);
@@ -187,24 +185,25 @@ public class TwitterServer {
             } else {
 
                 // PRINTING
-                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ")");
+                System.out.println("ADDING POST TO QUEUE OF " + addr.port() + ": (" + post_topic + ") -> " + post_text + " || Post Clock (" + serverClock + ") /= 1 + Global Server Clock (" + vectorClockact + ")");
 
                 // Adding to queue
                 serverQueue.get(serverId).put(serverClock, try_update);
 
                 // Re-checking if the value added to the queue is the next to be broadcasted
-                if (serverClock == vectorClock.getClock(serverId) + 1) {
+                if (serverClock == vectorClock.getClock(serverId) + 1) { // serverClock 5; Vector = 4 (+1=5)
+                    System.out.println("Welele ");
 
                     // Removing everything from the queue becasuse it's my turn
-                    for (int i = serverClock + 1; serverQueue.get(serverId).containsKey(i); i++) {
-
+                    for (int i = serverClock ; serverQueue.get(serverId).containsKey(i); i++) { // i a começar a 6
+                                                                                                   //G Fucking
                         try_update = serverQueue.get(serverId).remove(i);
 
                         post_text = try_update.getText();
                         post_topic = try_update.getCategory();
                         int index = this.postsDB.getIndex(post_topic);
 
-                        System.out.println("SENDING TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
+                        System.out.println("SENDING2 TO " + addr.port() + " FOR BROADCAST: (" + post_topic + ") -> " + post_text + " || Post Clock (" + try_update.getServerClock() + ") == 1 + Global Server Clock (" + vectorClock.getClock(serverId) + ") || Index: " + index);
 
                         Protos.Update broadcast = new Protos.Update(post_text, post_topic, index);
                         byte[] data = update_serializer.encode(broadcast);

@@ -28,12 +28,16 @@ public class TwitterClient {
     private Serializer post_serializer = new SerializerBuilder().addType(Post.class).build();
     private Serializer get_serializer = new SerializerBuilder().addType(Get.class).build();
     private Serializer list_serializer = new SerializerBuilder().addType(List.class).build();
-    private int counter = 0;
+    private Clock counter;
+    private String username;
 
     public TwitterClient(Address address, Address servidor) throws Exception {
+
         this.address = address;
         this.e = Executors.newFixedThreadPool(2);
         this.categories = new ArrayList<>();
+        this.counter = new Clock();
+        this.username = "Anonymous";
 
         this.messagingService = new NettyMessagingService.Builder()
                 .withName("Twitter_Client_" + address.toString())
@@ -103,6 +107,9 @@ public class TwitterClient {
                     case 3:
                         list_posts();
                         break;
+                    case 4:
+                        get_username(in);
+                        break;
                     default:
                         System.out.println("Opcao invalida");
                 }
@@ -113,6 +120,21 @@ public class TwitterClient {
                 ;
             }
 
+        }
+    }
+
+
+    private void get_username(BufferedReader in) {
+
+        System.out.println("Escreva o nome de utilizador: ");
+        try {
+            String utlizador = in.readLine();
+
+            this.username = utlizador;
+            this.counter = new Clock();
+
+        } catch (IOException e) {
+            System.out.println("Formato invalido");
         }
     }
 
@@ -185,7 +207,7 @@ public class TwitterClient {
                     System.out.println("Necessário pelo menos 1 categoria");
 
                 }else{
-                    Post post = new Post(mensagem, arrayList, counter++);
+                    Post post = new Post(mensagem, arrayList, username, counter.increment());
                     byte[] data = post_serializer.encode(post);
                     System.out.println(servidor.toString());
                     messagingService.sendAsync(servidor, "POST", data);
@@ -201,7 +223,7 @@ public class TwitterClient {
         if (categories.size() == 0) {
             System.out.println("Sem categorias selecionadas");
         } else {
-            Get get = new Get(categories, counter++);
+            Get get = new Get(categories, counter.increment());
 
             byte[] data = get_serializer.encode(get);
             System.out.println("Esperar pela resposta do servidor");
@@ -215,6 +237,7 @@ public class TwitterClient {
         System.out.println("# 1 - Fazer um Post                                 #");
         System.out.println("# 2 - Adicionar/Remover subscricoes                 #");
         System.out.println("# 3 - Pedir 10 posts mais recentes das subscricoes  #");
+        System.out.println("# 4 - Mudar de utilizador                           #");
         System.out.println("#####################################################");
     }
 

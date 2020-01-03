@@ -6,13 +6,21 @@ public class TryUpdate {
     private String category;
     private int serverId;
     private int serverClock;
+    private String user;
+    private int userClock;
 
-    public TryUpdate(String text, String category, int serverId, int serverClock) {
+    public TryUpdate(String text, String category, int serverId, int serverClock, String user, int userClock) {
         this.text = text;
         this.category = category;
         this.serverId = serverId;
         this.serverClock = serverClock;
+        this.user = user;
+        this.userClock = userClock;
     }
+
+    public int getUserClock() { return userClock; }
+
+    public String getUser() { return user; }
 
     public String getText() {
         return text;

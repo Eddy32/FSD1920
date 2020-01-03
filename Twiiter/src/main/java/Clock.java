@@ -8,4 +8,6 @@ public class Clock {
 
     public synchronized int increment () { return ++clock; }
 
+    public int get () {return this.clock; }
+
 }

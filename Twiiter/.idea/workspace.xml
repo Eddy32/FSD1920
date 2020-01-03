@@ -3,8 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="7d5cc674-2b21-4593-963b-8eda5421f088" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Clock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Clock.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Database/DataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/DataBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Database/ListPosts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Database/ListPosts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/Post.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/TryUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/TryUpdate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Protos/Update.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Protos/Update.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterBot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterBot.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/TwitterServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/VectorClock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/VectorClock.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -372,41 +380,5 @@
       <screen x="-1920" y="23" width="1920" height="1057" />
     </state>
     <state width="1878" height="357" key="GridCell.Tab.1.right/0.23.1440.877/-1920.23.1920.1057@-1920.23.1920.1057" timestamp="1577795982902" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/TwitterServer.java</url>
-          <line>279</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/TwitterServer.java</url>
-          <line>175</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/TwitterServer.java</url>
-          <line>157</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/TwitterServer.java</url>
-          <line>204</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/TwitterServer.java</url>
-          <line>159</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/TwitterServer.java</url>
-          <line>177</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

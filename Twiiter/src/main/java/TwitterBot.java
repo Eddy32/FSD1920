@@ -32,6 +32,8 @@ public class TwitterBot implements Runnable {
     private int no_posts;
     private int no_topics;
 
+    private Clock clock;
+
     public TwitterBot(Address address, Address servidor, int id, int no_posts, int no_topics) {
 
         this.address = address;
@@ -40,6 +42,7 @@ public class TwitterBot implements Runnable {
         this.id = id;
         this.no_posts = no_posts;
         this.no_topics = no_topics;
+        this.clock = new Clock();
 
         this.messagingService = new NettyMessagingService.Builder()
                 .withName("Twitter_Bot_" + address.toString())
@@ -93,8 +96,9 @@ public class TwitterBot implements Runnable {
 
             for (int j=0; j<no_topics; j++) topics.add(" #" + j);
 
-            Post post = new Post(text.toString(), topics);
+            Post post = new Post(text.toString(), topics, "Bot_" + id, clock.increment());
             byte[] data = post_serializer.encode(post);
+
             System.out.println(servidor.toString());
             messagingService.sendAsync(servidor, "POST", data);
 

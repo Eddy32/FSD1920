@@ -5,10 +5,12 @@ import java.util.ArrayList;
 public class ListPosts {
     private ArrayList<Post> posts;
     private int index;
+    private int indexLastUpdated;
 
     public ListPosts(){
         this.posts = new ArrayList<>();
         this.index = 1;
+        this.indexLastUpdated = -1;
     }
 
     public ListPosts(ArrayList<Post> posts) {
@@ -23,14 +25,12 @@ public class ListPosts {
         return this.posts;
     }
 
-    public synchronized void addPost(String post,int logicCounter, int index){
+    public synchronized void addPost(String post, int logicCounter, int index){
 
-        if(this.posts.size() > index%10){
-            this.posts.remove(index%10);
-        }
-        Post p = new Post(post,logicCounter);
-        this.posts.add(index%10,p);
-
+        if (this.posts.size() > index%10) { this.posts.remove(index % 10); }
+        Post p = new Post(post, logicCounter);
+        this.posts.add(index % 10, p);
+        this.indexLastUpdated++;
 
     }
 

@@ -96,7 +96,7 @@ public class TwitterBot implements Runnable {
             Random r = new Random();
             for (int j=0; j<no_topics; j++) topics.add("#1" );
 
-            for (int j=0; j<no_topics; j++) topics.add(" #" + j);
+            //for (int j=0; j<no_topics; j++) topics.add(" #" + j);
 
             Post post = new Post(text.toString(), topics, "Bot_" + id, clock.increment());
             byte[] data = post_serializer.encode(post);

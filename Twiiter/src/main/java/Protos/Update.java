@@ -12,6 +12,7 @@ public class Update {
         return text;
     }
     public void setNew_clock(int a){ this.new_clock = a ;}
+    public int getNew_clock(){ return this.new_clock ;}
     public void setText(String text) {
         this.text = text;
     }

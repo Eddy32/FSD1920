@@ -323,6 +323,7 @@ public class TwitterServer {
 
                 // Sending broadcast of current post
                 Protos.Update broadcast = new Protos.Update(post_text, post_topic, index.getLeft(), index.getRight());
+                broadcast.setNew_clock(try_update.getServerClock());
                 byte[] data = update_serializer.encode(broadcast);
 
                 this.logBR.writeLog("BROADCAST " + try_update.toString() + " " + addresses.get(serverId).port(),try_update.getServerClock());
@@ -404,7 +405,7 @@ public class TwitterServer {
             Update update = update_serializer.decode(bytes);
             int global_clock = update.getGlobal_clock();
             this.log2FC.writeLog("2FC " + update.toString() + " " + addr.port() ,global_clock);
-            messagingService.sendAsync(addr,"ACK", ack_serializer.encode(new Pair<Integer, Integer>(2,global_clock)));
+            messagingService.sendAsync(addr,"ACK", ack_serializer.encode(new Pair<Integer, Integer>(2,update.getNew_clock())));
 
             System.out.println("Recebi broadcast");
             this.confirms.put(update.getGlobal_clock(), 0);

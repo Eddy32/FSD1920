@@ -1,4 +1,6 @@
 
+import Database.DataBase;
+import Protos.Update;
 import io.atomix.storage.journal.Indexed;
 import io.atomix.storage.journal.SegmentedJournal;
 import io.atomix.storage.journal.SegmentedJournalReader;
@@ -8,6 +10,8 @@ import io.atomix.utils.serializer.Serializer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static Protos.Update.buildUpdate;
 
 public class Log {
     private String logName;
@@ -29,6 +33,8 @@ public class Log {
         this.r = sj.openReader(0);
         this.w = sj.writer();
         this.lines = new ConcurrentHashMap<Integer,ArrayList<Long>>();
+
+
     }
 
     public ArrayList<String> getInstructions(){
@@ -46,23 +52,32 @@ public class Log {
 
 
     public synchronized ArrayList<String> readLog(int key){
-
-
         ArrayList<String> log = new ArrayList<>();
-
-
         //while(this.r.hasNext())
-
         for(Long i: this.lines.get(key) ){
             this.r = sj.openReader(i);
             Indexed<String> e = r.next();
             log.add(e.entry());
             System.out.println("ENTRY NO LOG:"+e.entry());
         }
-
         this.r.close();
-
         return log;
+    }
+
+    public DataBase readDB(){
+        DataBase db = new DataBase();
+        while(this.r.hasNext()) {
+            Indexed<String> e = r.next();
+
+            Update update = buildUpdate(e.entry());
+            String post_text = update.getText();
+            String post_topic = update.getCategory();
+            int topicIndex = update.getIndex();
+
+            db.addPost(post_topic, post_text, topicIndex);
+
+        }
+        return  db;
 
     }
 
@@ -95,7 +110,14 @@ public class Log {
 
     }
 
-    public void addLines(int key, long index){
+    public synchronized void writeDB(String info){
+
+        this.w.append(info);
+
+    }
+
+
+        public void addLines(int key, long index){
         if(!this.lines.containsKey(key)){
             ArrayList<Long> line = new ArrayList<Long>();
             this.lines.put(key,line);
@@ -178,12 +200,7 @@ public class Log {
                 .build();
 
 
-        SegmentedJournalReader<String> r = sj.openReader(0);
-        while(r.hasNext()) {
-            Indexed<String> e = r.next();
 
-            System.out.println(e.index()+": "+e.entry() + ".");
-
-        }
     }
 }
+

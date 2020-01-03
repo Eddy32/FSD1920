@@ -6,11 +6,12 @@ public class Update {
     private String category;
     private int index;
     private int global_clock;
+    private int new_clock;
 
     public String getText() {
         return text;
     }
-
+    public void setNew_clock(int a){ this.new_clock = a ;}
     public void setText(String text) {
         this.text = text;
     }
@@ -47,12 +48,12 @@ public class Update {
     }
 
     public String toString(){
-        return (this.text + '.' + this.category + '.' + this.index + '.' + this.global_clock);
+        return (this.text + ';' + this.category + ';' + this.index + ';' + this.global_clock);
     }
 
     public static Update buildUpdate(String update){
         String[] args;
-        args = update.split("\\.+");
-        return new Update(args[0],args[1],Integer.parseInt(args[2]),Integer.parseInt(args[4]));
+        args = update.split(";+");
+        return new Update(args[0],args[1],Integer.parseInt(args[2]),Integer.parseInt(args[3]));
     }
 }

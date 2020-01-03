@@ -302,15 +302,60 @@ public class TwitterServer {
             String post_owner = update.getUsername();
             int post_owner_clock = update.getUserClock();
 
-            System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex + " || User = " + post_owner + " UserClock = " + post_owner_clock);
-
             // IF USER CLOCK IS MATCHING
+            if (post_owner_clock == clientClocks.getClock(post_owner) + 1) {
 
-            this.postsDB.addPost(post_topic, post_text, topicIndex);
+                System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex + " || User = " + post_owner + " UserClock = " + post_owner_clock);
 
-            //if (this.clientClocks.getClock())
+                this.postsDB.addPost(post_topic, post_text, topicIndex);
 
-            //if (this.postQueue.)
+                this.clientClocks.increment(post_owner);
+
+                // Checking rest of the queue
+                for (int i=post_owner_clock + 1; this.postQueue.getOrDefault(post_owner, new TreeMap<>()).containsKey(i); i++) {
+
+                    update = this.postQueue.get(post_owner).get(i);
+
+                    post_text = update.getText();
+                    post_topic = update.getCategory();
+                    topicIndex = update.getIndex();
+
+                    post_owner = update.getUsername();
+
+                    System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+                    this.postsDB.addPost(post_topic, post_text, topicIndex);
+
+                    this.clientClocks.increment(post_owner);
+
+                }
+
+            } else {
+
+                // Adding post to queue
+                this.postQueue.get(post_owner).put(post_owner_clock, update);
+
+                if (post_owner_clock == clientClocks.getClock(post_owner) + 1) {
+
+                    for (int i=post_owner_clock; this.postQueue.getOrDefault(post_owner, new TreeMap<>()).containsKey(i); i++) {
+
+                        update = this.postQueue.get(post_owner).get(i);
+
+                        post_text = update.getText();
+                        post_topic = update.getCategory();
+                        topicIndex = update.getIndex();
+
+                        post_owner = update.getUsername();
+
+                        System.out.println("UPDATING LOCAL DB: (" + post_topic + ") -> " + post_text + " || Index = " + topicIndex + " || User = " + post_owner + " UserClock = " + post_owner_clock);
+                        this.postsDB.addPost(post_topic, post_text, topicIndex);
+
+                        this.clientClocks.increment(post_owner);
+
+                    }
+
+                }
+
+            }
 
 
         }, e);
@@ -437,6 +482,7 @@ public class TwitterServer {
     }
 
     public synchronized void update2PC(int key){
+
         this.confirms.replace(key,this.confirms.get(key)+1);
     }
 

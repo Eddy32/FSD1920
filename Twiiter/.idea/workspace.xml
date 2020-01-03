@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d5cc674-2b21-4593-963b-8eda5421f088" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/TestJournal.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterBot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterBot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/TwitterLoadBalancer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterLoadBalancer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/TwitterServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TwitterServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -70,7 +67,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.6- TwitterClient (9000)">
+  <component name="RunManager" selected="Application.11 - TwitterBot (8000)">
     <configuration name="0- TwitterServer (10001)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TwitterServer" />
       <module name="Twitter" />
@@ -98,7 +95,7 @@
     <configuration name="11 - TwitterBot (8000)" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="TwitterBot" />
       <module name="Twitter" />
-      <option name="PROGRAM_PARAMETERS" value="8000 10000 10 10 10" />
+      <option name="PROGRAM_PARAMETERS" value="8000 10000 1 100 2" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

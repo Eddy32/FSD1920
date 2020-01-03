@@ -28,6 +28,7 @@ public class TwitterServer {
     private VectorClock vectorClock; // Global clock (used only by leader)
     private ArrayList<TreeMap<Integer, Protos.TryUpdate>> serverQueue; // Array of the post queue for each server (used only by leader)
     private DataBase postsDB; // Post database
+    private TestJournal log;
 
 
     public TwitterServer(int id, List<Address> addresses) throws Exception {
@@ -41,6 +42,7 @@ public class TwitterServer {
         this.vectorClock = new VectorClock(addresses.size());
         this.clock = new Clock();
         this.postsDB = new DataBase();
+        this.log = new TestJournal("log" + id);
 
         this.serverQueue = new ArrayList<>();
         for (int i=0; i<addresses.size(); i++) serverQueue.add(new TreeMap<>());
@@ -107,7 +109,7 @@ public class TwitterServer {
 
         }, e);
 
-        
+
         // When a POST message is received
         messagingService.registerHandler("POST", (addr,bytes)-> {
 
@@ -135,7 +137,7 @@ public class TwitterServer {
                 Protos.TryUpdate try_update = new Protos.TryUpdate(post_text, topic, id, post_clock);
 
                 byte[] data = try_update_serializer.encode(try_update);
-
+                this.log.writeLog("SENDING",post_clock);
                 messagingService.sendAsync(addresses.get(leader), "TRY_UPDATE", data);
 
             }

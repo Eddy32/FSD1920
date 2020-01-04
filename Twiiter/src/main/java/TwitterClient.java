@@ -212,7 +212,7 @@ public class TwitterClient {
                     arrayList.add(m.group());
                 }
                 for (String cena : arrayList)
-                    System.out.println(cena);
+                    System.out.println(1);
                 if( arrayList.size() < 1){
                     System.out.println("Necessário pelo menos 1 categoria");
 

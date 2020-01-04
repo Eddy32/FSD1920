@@ -1,5 +1,6 @@
 import Database.Pair;
 import Database.Post;
+import Protos.TryUpdate;
 import Protos.Update;
 import io.atomix.cluster.messaging.ManagedMessagingService;
 import io.atomix.cluster.messaging.impl.NettyMessagingService;
@@ -120,14 +121,13 @@ public class TwitterServer {
                     this.logBR.confirmAction(key.getRight());
                     break;
                 case 3:
-                    // COMMIT FAIL
                         synchronized (faseCommit){
                             if (this.faseCommit.containsKey(key.getRight())){
                                 int aux = this.faseCommit.get(key.getRight());
-                                if( aux == addresses.size() ){
+                                if( ++aux == addresses.size() ){
                                     log2FC.confirmAction(key.getRight());
                                 }else{
-                                    this.faseCommit.put(key.getRight(), ++aux);
+                                    this.faseCommit.put(key.getRight(), aux);
                                 }
                             }
                             else{
@@ -323,10 +323,9 @@ public class TwitterServer {
 
                 // Sending broadcast of current post
                 Protos.Update broadcast = new Protos.Update(post_text, post_topic, index.getLeft(), index.getRight());
-                broadcast.setNew_clock(try_update.getServerClock());
                 byte[] data = update_serializer.encode(broadcast);
 
-                this.logBR.writeLog("BROADCAST " + try_update.toString() + " " + addresses.get(serverId).port(),try_update.getServerClock());
+                this.logBR.writeLog("BROADCAST " + try_update.toString() + " " + addresses.get(serverId).port(),index.getRight());
                 byte [] dataKey = ack_serializer.encode(new Pair<Integer, Integer>(1, try_update.getServerClock()) );
                 //envia o ack do pacote que acabou de receber
                 messagingService.sendAsync(addr,"ACK", dataKey);
@@ -405,7 +404,7 @@ public class TwitterServer {
             Update update = update_serializer.decode(bytes);
             int global_clock = update.getGlobal_clock();
             this.log2FC.writeLog("2FC " + update.toString() + " " + addr.port() ,global_clock);
-            messagingService.sendAsync(addr,"ACK", ack_serializer.encode(new Pair<Integer, Integer>(2,update.getNew_clock())));
+            messagingService.sendAsync(addr,"ACK", ack_serializer.encode(new Pair<Integer, Integer>(2,update.getGlobal_clock())));
 
             System.out.println("Recebi broadcast");
             this.confirms.put(update.getGlobal_clock(), 0);
@@ -625,8 +624,24 @@ public class TwitterServer {
 
 
         messagingService.start();
-        Thread.sleep(5000);
-        startElection();
+
+        ArrayList<Pair<Update,Integer>> br_read = logBR.readBR();
+        for(Pair<Update,Integer> to_send : br_read){
+            messagingService.sendAsync(Address.from(to_send.getRight()) ,"BROADCAST", update_serializer.encode(to_send.getLeft()) );
+        }
+        ArrayList<Pair<TryUpdate,Integer>> tu_read = logTU.readTU();
+        for(Pair<TryUpdate,Integer> to_send : tu_read){
+            messagingService.sendAsync(Address.from(to_send.getRight()) ,"TRY_UPDATE", try_update_serializer.encode(to_send.getLeft()) );
+        }
+        ArrayList<Pair<Protos.Update,Integer>> fc_read = log2FC.readFC();
+        for(Pair<Protos.Update,Integer> to_send : fc_read){
+            for(Address addr : this.addresses){
+                this.confirms.put(to_send.getLeft().getGlobal_clock(), 0);
+                messagingService.sendAsync(addr ,"REQUEST", update_serializer.encode(to_send.getLeft()) );
+            }
+        }
+        // Thread.sleep(5000);
+        // startElection();
 
 
     }

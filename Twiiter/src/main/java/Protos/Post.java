@@ -51,7 +51,7 @@ public class Post {
 
     public static Post buildUpdate(String post){
         String[] args,categorias;
-        args = post.split("\\.+");
+        args = post.split(";+");
         ArrayList<String> cats = new ArrayList<String>();
         categorias = args[4].split("\\-+");
 

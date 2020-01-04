@@ -1,5 +1,8 @@
 
 import Database.DataBase;
+import Database.Pair;
+import Protos.Post;
+import Protos.TryUpdate;
 import Protos.Update;
 import io.atomix.storage.journal.Indexed;
 import io.atomix.storage.journal.SegmentedJournal;
@@ -68,18 +71,85 @@ public class Log {
         DataBase db = new DataBase();
         while(this.r.hasNext()) {
             Indexed<String> e = r.next();
-
             Update update = buildUpdate(e.entry());
             String post_text = update.getText();
             String post_topic = update.getCategory();
             int topicIndex = update.getIndex();
-
             db.addPost(post_topic, post_text, topicIndex);
-
         }
         return  db;
-
     }
+
+    public ArrayList<Pair<Update,Integer> > readBR(){
+        ArrayList<Pair <Update, Integer> > array = new ArrayList<>();
+        HashMap <Integer, String > linhas = new HashMap<>();
+
+        while(this.r.hasNext()) {
+            Indexed<String> e = r.next();
+            String aux = e.entry();
+            String[] aux2 = aux.split(" ");
+            if(aux2[1].equals("CONFIRM")){
+                linhas.remove(Integer.parseInt(aux2[0]));
+            }
+            else {
+                linhas.put(Integer.parseInt(aux2[0]), aux );
+            }
+        }
+        for (String linha : linhas.values() ){
+            String[] aux3 = linha.split(" ");
+            array.add( new Pair<Update, Integer>(Update.buildUpdate(aux3[2]),Integer.parseInt(aux3[3])));
+        }
+        return array;
+    }
+
+    public ArrayList<Pair<TryUpdate,Integer> > readTU(){
+        ArrayList<Pair <TryUpdate, Integer> > array = new ArrayList<>();
+        HashMap <Integer, String > linhas = new HashMap<>();
+
+        while(this.r.hasNext()) {
+            Indexed<String> e = r.next();
+            String aux = e.entry();
+            String[] aux2 = aux.split(" ");
+            if(aux2[1].equals("CONFIRM")){
+                linhas.remove(Integer.parseInt(aux2[0]));
+            }
+            else {
+                linhas.put(Integer.parseInt(aux2[0]), aux );
+            }
+        }
+        for (String linha : linhas.values() ){
+            String[] aux3 = linha.split(" ");
+            array.add( new Pair<TryUpdate, Integer>(TryUpdate.buildTryUpdate(aux3[2]),Integer.parseInt(aux3[3])));
+        }
+
+        return array;
+    }
+
+    public ArrayList<Pair<Update,Integer> > readFC(){
+        ArrayList<Pair <Update, Integer> > array = new ArrayList<>();
+        HashMap <Integer, String > linhas = new HashMap<>();
+
+        while(this.r.hasNext()) {
+            Indexed<String> e = r.next();
+            String aux = e.entry();
+            String[] aux2 = aux.split(" ");
+            if(aux2[1].equals("CONFIRM")){
+                linhas.remove(Integer.parseInt(aux2[0]));
+            }
+            else {
+                linhas.put(Integer.parseInt(aux2[0]), aux );
+            }
+            for (String linha : linhas.values() ){
+                String[] aux3 = linha.split(" ");
+                array.add( new Pair<Update, Integer>(Update.buildUpdate(aux3[2]),Integer.parseInt(aux3[3])));
+            }
+
+
+        }
+        return array;
+    }
+
+
 
     public  void resetLog(){
         Serializer s = Serializer.builder()
@@ -153,7 +223,6 @@ public class Log {
     public synchronized void confirmAction(int key){
         this.w.append(key + " " + "CONFIRM");
         this.lines.get(key).remove(0);
-
     }
 
 

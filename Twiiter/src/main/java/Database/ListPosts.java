@@ -9,7 +9,7 @@ public class ListPosts {
 
     public ListPosts(){
         this.posts = new ArrayList<>();
-        this.index = 1;
+        this.index = 0;
         this.indexLastUpdated = -1;
     }
 

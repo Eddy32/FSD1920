@@ -67,7 +67,7 @@ public class DataBase {
             l.unlock();
 
             int tam = posts.size();
-            for(int i = 0; i < tam; i++){
+            for(int i = -1; i < tam -1; i++){
                 order.add(posts.get((index+i)%tam).clone()); //nem consigo descrever o que aqui se passou #Stonks
             }
         }
